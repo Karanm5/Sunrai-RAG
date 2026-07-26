@@ -1,0 +1,8 @@
+# Minimal set: runs the full test suite and the offline CI smoke test.
+# No torch, no model downloads, no network. Use this to verify the logic
+# layers quickly before committing to the full install.
+numpy==1.26.4
+pyyaml==6.0.2
+networkx==3.3
+pytest==8.3.2
+ruff==0.6.4

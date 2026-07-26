@@ -1,0 +1,33 @@
+# Pinned for reproducibility. Versions verified as a mutually compatible set.
+# Install: pip install -r requirements.txt
+
+# --- core (needed for every stage) ---
+numpy==1.26.4
+pyyaml==6.0.2
+networkx==3.3
+pillow==10.4.0
+
+# --- dataset streaming ---
+datasets==2.21.0
+webdataset==0.2.86
+
+# --- OCR (also needs the tesseract binary; see README) ---
+pytesseract==0.3.13
+
+# --- embeddings ---
+sentence-transformers==3.0.1
+transformers==4.44.2
+torch==2.4.1
+
+# --- generation backends (both optional at runtime) ---
+anthropic==0.34.2          # backend: anthropic
+accelerate==0.34.2         # backend: local
+
+# --- demo ---
+streamlit==1.38.0
+pandas==2.2.2
+altair==5.4.1
+
+# --- testing / lint ---
+pytest==8.3.2
+ruff==0.6.4
