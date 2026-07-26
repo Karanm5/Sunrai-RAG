@@ -1,5 +1,8 @@
 artifacts/
 data/
+# Synthetic smoke-test output. Real results in results/ ARE committed; these
+# are not results and must never be mistaken for them.
+results/smoke/
 __pycache__/
 *.pyc
 .pytest_cache/
