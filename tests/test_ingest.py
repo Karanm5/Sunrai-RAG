@@ -296,3 +296,40 @@ def test_upscaling_works_without_pillow_installed(monkeypatch):
     engine = TesseractEngine(min_crop_height=200)
     assert engine._resample_filter() is None
     assert engine._prepare(_FakeImage(400, 50)).height == 200
+
+
+# ---------- tesseract binary discovery (cross-platform) ----------
+
+def test_explicit_tesseract_path_wins(monkeypatch):
+    from sunrai_rag.ingest.ocr import find_tesseract_binary
+    assert find_tesseract_binary(r"C:\custom\tesseract.exe") == r"C:\custom\tesseract.exe"
+
+
+def test_path_lookup_used_when_available(monkeypatch):
+    import shutil
+
+    from sunrai_rag.ingest import ocr as ocr_mod
+    monkeypatch.setattr(shutil, "which", lambda name: "/usr/bin/tesseract")
+    assert ocr_mod.find_tesseract_binary() == "/usr/bin/tesseract"
+
+
+def test_falls_back_to_known_install_locations(monkeypatch):
+    """Windows installers often skip PATH, so known locations are checked."""
+    import os
+    import shutil
+
+    from sunrai_rag.ingest import ocr as ocr_mod
+    win_path = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    monkeypatch.setattr(shutil, "which", lambda name: None)
+    monkeypatch.setattr(os.path, "isfile", lambda p: p == win_path)
+    assert ocr_mod.find_tesseract_binary() == win_path
+
+
+def test_returns_none_when_nothing_found(monkeypatch):
+    import os
+    import shutil
+
+    from sunrai_rag.ingest import ocr as ocr_mod
+    monkeypatch.setattr(shutil, "which", lambda name: None)
+    monkeypatch.setattr(os.path, "isfile", lambda p: False)
+    assert ocr_mod.find_tesseract_binary() is None

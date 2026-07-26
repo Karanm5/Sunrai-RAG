@@ -41,6 +41,7 @@ class IngestConfig:
     ocr_lang: str = "eng"
     ocr_psm: int = 6
     ocr_min_crop_height: int = 200  # upscale small crops; see TesseractEngine
+    tesseract_cmd: str = ""  # full path to tesseract.exe; blank = auto-detect
     save_crops: bool = True
 
 

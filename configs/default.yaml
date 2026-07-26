@@ -18,6 +18,8 @@ ingest:
   min_ocr_chars: 20       # below this, OCR output is too noisy to index
   ocr_lang: eng
   ocr_psm: 6              # single uniform block: regions are pre-segmented
+  tesseract_cmd: ""        # blank = auto-detect. Windows users: if OCR fails,
+                           # set this to C:/Program Files/Tesseract-OCR/tesseract.exe
   ocr_min_crop_height: 200 # upscale small crops before OCR; measured 0.74 -> 0.99
                            # fidelity on low-resolution pages, saturates at 200px
   save_crops: true

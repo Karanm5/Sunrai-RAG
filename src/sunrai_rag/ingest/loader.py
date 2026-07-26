@@ -264,6 +264,7 @@ def ingest(cfg: Config) -> Corpus:
         lang=cfg.ingest.ocr_lang,
         psm=cfg.ingest.ocr_psm,
         min_crop_height=cfg.ingest.ocr_min_crop_height,
+        tesseract_cmd=cfg.ingest.tesseract_cmd or None,
     )
 
     all_regions: list[Region] = []

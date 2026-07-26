@@ -16,13 +16,17 @@ the full ingestion path with a deterministic fake and no Tesseract install.
 from __future__ import annotations
 
 import json
+import logging
+import os
 import re
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
 
 from ..schemas import Region
+
+log = logging.getLogger(__name__)
 
 _WHITESPACE = re.compile(r"\s+")
 # Ligatures and hyphenation artefacts that OCR reliably produces on PMC renders.
@@ -34,6 +38,41 @@ class OCREngine(Protocol):
     """Anything that can turn an image crop into (text, mean_confidence)."""
 
     def read(self, image: Any) -> tuple[str, float]: ...
+
+
+def find_tesseract_binary(explicit_path: str | None = None) -> str | None:
+    """Locate the tesseract executable across platforms.
+
+    On Linux and macOS tesseract is normally on PATH and this is a no-op. On
+    Windows the common installers do not always add it, so pytesseract fails
+    with a confusing "tesseract is not installed" error even when it is. We
+    check the standard install locations before giving up.
+
+    Returns the path to use, or None if PATH already resolves it.
+    """
+    import shutil
+
+    if explicit_path:
+        return explicit_path
+
+    found = shutil.which("tesseract")
+    if found:
+        return found
+
+    candidates = [
+        # Windows: default locations for the UB Mannheim and official builds
+        r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+        r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+        os.path.expanduser(r"~\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"),
+        os.path.expanduser(r"~\AppData\Local\Tesseract-OCR\tesseract.exe"),
+        # macOS Homebrew, both architectures
+        "/opt/homebrew/bin/tesseract",
+        "/usr/local/bin/tesseract",
+    ]
+    for candidate in candidates:
+        if os.path.isfile(candidate):
+            return candidate
+    return None
 
 
 @dataclass
@@ -60,6 +99,30 @@ class TesseractEngine:
     lang: str = "eng"
     psm: int = 6
     min_crop_height: int = 200
+    tesseract_cmd: str | None = None
+    _configured: bool = field(default=False, init=False, repr=False)
+
+    def _ensure_binary(self) -> None:
+        """Point pytesseract at the binary once, with a clear error if absent."""
+        if self._configured:
+            return
+        import pytesseract
+
+        path = find_tesseract_binary(self.tesseract_cmd)
+        if path:
+            pytesseract.pytesseract.tesseract_cmd = path
+            log.info("Using tesseract at %s", path)
+        else:
+            raise RuntimeError(
+                "Could not find the tesseract executable.\n"
+                "  Windows: install from "
+                "https://github.com/UB-Mannheim/tesseract/wiki, then either "
+                "tick 'Add to PATH' during setup or set ingest.tesseract_cmd "
+                "in your config to the full path of tesseract.exe\n"
+                "  macOS:   brew install tesseract\n"
+                "  Linux:   sudo apt-get install tesseract-ocr tesseract-ocr-eng"
+            )
+        self._configured = True
 
     @staticmethod
     def _resample_filter() -> Any:
@@ -95,6 +158,7 @@ class TesseractEngine:
     def read(self, image: Any) -> tuple[str, float]:
         import pytesseract  # imported lazily so logic tests need no binary
 
+        self._ensure_binary()
         image = self._prepare(image)
         config = f"--psm {self.psm}"
         data = pytesseract.image_to_data(
