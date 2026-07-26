@@ -83,17 +83,25 @@ class TesseractEngine:
     regions, which are already segmented into single blocks by the layout
     annotation -- letting Tesseract re-segment tends to hurt.
 
-    `min_crop_height` upscales small crops before OCR. This is not a guess:
-    measured on rendered fixtures (scripts/verify_ocr.py), resolution is the
-    dominant OCR failure mode -- far more than blur or JPEG artefacts -- and
-    upscaling recovers most of the loss:
+    `min_crop_height` upscales small crops before OCR. This is not a guess,
+    and on this dataset it is not optional either.
 
-        page quality      no upscale      upscale to 200px
-        ~100 DPI          0.742 mean      0.990 mean   (worst 0.271 -> 0.962)
-        ~80 DPI           0.189 mean      0.821 mean
+    Measured: resolution is the dominant OCR failure mode, far more than blur
+    or JPEG artefacts. PubLayNet pages render at 610x794 (~72 DPI), so a
+    typical text region is only ~50px tall and its glyphs are 8-10px:
 
-    The gain saturates around 200px, so a larger target only costs time.
-    Set to 0 to disable.
+        font size    no upscale    upscale to 200px
+        8px          0.500         1.000
+        9px          0.677         1.000
+        10px         0.993         1.000
+        12px         1.000         1.000
+
+    Without upscaling, small-text regions are silently misread rather than
+    failing loudly -- the damage then surfaces as poor retrieval, which is a
+    misleading place to debug from.
+
+    200px is sufficient; 300px adds nothing and 400px slightly degrades the
+    smallest fonts through over-interpolation. Set to 0 to disable.
     """
 
     lang: str = "eng"
