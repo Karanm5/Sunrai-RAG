@@ -247,6 +247,7 @@ def test_malformed_json_text_raises_clearly():
 # ---------- OCR crop upscaling (measured optimisation) ----------
 
 class _FakeImage:
+    """Stands in for a PIL image so ingestion is testable without Pillow."""
     def __init__(self, w, h): self.width, self.height = w, h
     def resize(self, size, resample=None):
         return _FakeImage(size[0], size[1])
@@ -272,3 +273,26 @@ def test_large_crops_are_not_upscaled():
 def test_upscaling_can_be_disabled():
     original = _FakeImage(400, 50)
     assert TesseractEngine(min_crop_height=0)._prepare(original) is original
+
+
+def test_upscaling_works_without_pillow_installed(monkeypatch):
+    """Regression guard: CI installs a minimal dependency set with no Pillow.
+
+    An unconditional `from PIL import Image` inside the upscaling path broke
+    CI once while passing locally, because Pillow happened to be installed on
+    the dev machine.
+    """
+    import builtins
+
+    real_import = builtins.__import__
+
+    def no_pillow(name, *args, **kwargs):
+        if name == "PIL" or name.startswith("PIL."):
+            raise ImportError("Pillow is not installed")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", no_pillow)
+
+    engine = TesseractEngine(min_crop_height=200)
+    assert engine._resample_filter() is None
+    assert engine._prepare(_FakeImage(400, 50)).height == 200

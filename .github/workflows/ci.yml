@@ -1,24 +1,90 @@
 name: CI
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [main, "feat/**", "fix/**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  # Fast gate. Installs ONLY the minimal set, which is the contract the
+  # package advertises: the logic layers must be importable and testable
+  # without models, network, API keys or the image stack. Regressions against
+  # that contract are exactly what this job exists to catch.
   test:
+    name: lint + unit tests (minimal deps)
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      # Minimal deps only: the suite is designed to run with no models,
-      # no network and no API key, so CI stays fast and deterministic.
-      - run: pip install -r requirements-min.txt
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements-min.txt
+
+      - name: Install minimal dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-min.txt
+
+      - name: Check for dependency conflicts
+        run: pip check
+
       - name: Lint
         run: ruff check src/ tests/
-      - name: Test
-        run: PYTHONPATH=src pytest tests/ -v
-      - name: Verify configs parse
+
+      - name: Unit tests
+        run: PYTHONPATH=src pytest tests/ -v --tb=short
+
+      - name: Configs parse and validate
         run: |
           PYTHONPATH=src python -c "
           from sunrai_rag.config import load_config
-          for f in ['configs/default.yaml','configs/ci.yaml']:
-              load_config(f); print(f, 'OK')"
+          for path in ('configs/default.yaml', 'configs/ci.yaml', 'configs/groq.yaml'):
+              cfg = load_config(path)
+              print(path, 'OK backend=' + cfg.llm.backend)
+          "
+
+  # Slower gate with the real image stack and a real OCR binary. This catches
+  # integration breakage a stubbed unit test cannot: an earlier regression
+  # imported Pillow inside the OCR path and passed locally purely because
+  # Pillow happened to be installed on the dev machine.
+  integration:
+    name: real OCR + end-to-end pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install tesseract
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng
+          tesseract --version
+
+      - name: Install image + test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-min.txt pillow==10.4.0 pytesseract==0.3.13
+
+      - name: Regenerate fixtures from source
+        run: python scripts/make_fixtures.py /tmp/fixtures
+
+      - name: Verify real OCR against known ground truth
+        run: python scripts/verify_ocr.py
+
+      - name: End-to-end pipeline smoke test
+        run: python scripts/smoke_e2e.py

@@ -61,6 +61,24 @@ class TesseractEngine:
     psm: int = 6
     min_crop_height: int = 200
 
+    @staticmethod
+    def _resample_filter() -> Any:
+        """LANCZOS filter if Pillow is present, otherwise None.
+
+        Kept optional on purpose. This module advertises itself as runnable
+        without the heavy image stack, and the test suite relies on that to
+        run on a minimal dependency set in CI. Importing Pillow
+        unconditionally here silently broke that contract once already.
+
+        Also tolerates Pillow's move of the constants onto `Image.Resampling`.
+        """
+        try:
+            from PIL import Image as PILImage
+        except ImportError:
+            return None
+        namespace = getattr(PILImage, "Resampling", PILImage)
+        return getattr(namespace, "LANCZOS", None)
+
     def _prepare(self, image: Any) -> Any:
         """Upscale crops that are too small for reliable OCR."""
         if not self.min_crop_height:
@@ -68,13 +86,11 @@ class TesseractEngine:
         height = getattr(image, "height", None)
         if not height or height >= self.min_crop_height:
             return image
-        from PIL import Image as PILImage  # lazy: keeps logic tests dependency-free
 
         factor = self.min_crop_height / height
-        return image.resize(
-            (max(1, int(image.width * factor)), self.min_crop_height),
-            PILImage.LANCZOS,
-        )
+        size = (max(1, int(image.width * factor)), self.min_crop_height)
+        resample = self._resample_filter()
+        return image.resize(size, resample) if resample is not None else image.resize(size)
 
     def read(self, image: Any) -> tuple[str, float]:
         import pytesseract  # imported lazily so logic tests need no binary

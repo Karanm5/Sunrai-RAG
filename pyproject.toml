@@ -22,7 +22,15 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B"]
-ignore = ["E501"]
+ignore = [
+    "E501",  # line length: handled by formatter conventions, not worth failing on
+    # UP038 asks for isinstance(x, A | B) over isinstance(x, (A, B)). Ruff has
+    # since withdrawn the rule because the union form is measurably slower at
+    # runtime, and these checks sit in the per-region ingestion hot path.
+    # Pinned as an explicit decision so the code lints identically across
+    # ruff versions rather than depending on which one happens to be installed.
+    "UP038",
+]
 
 [tool.ruff.lint.per-file-ignores]
 # Tests favour compact set-up lines; these rules are style-only there.
