@@ -1,0 +1,274 @@
+"""Command-line entry points for every pipeline stage.
+
+    python -m sunrai_rag.cli ingest    --config configs/default.yaml
+    python -m sunrai_rag.cli index     --config configs/default.yaml
+    python -m sunrai_rag.cli kg        --config configs/default.yaml
+    python -m sunrai_rag.cli build-qa  --config configs/default.yaml
+    python -m sunrai_rag.cli evaluate  --config configs/default.yaml
+    python -m sunrai_rag.cli ask       --config configs/default.yaml -q "..."
+
+Each stage persists its artefact, so a stage can be re-run without repeating
+the expensive ones. This is what makes iteration on retrieval cheap after a
+single slow OCR pass.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import logging
+import sys
+from pathlib import Path
+
+from .config import load_config, set_global_seeds
+from .eval.build_qa import build_qa_set, load_qa_set, qa_set_stats, save_qa_set
+from .eval.run_eval import format_summary, run_comparison, write_results
+from .index.bm25 import BM25Index
+from .index.vector_store import VectorStore
+from .ingest.loader import Corpus, ingest
+from .kg.extract import LLMExtractor, RuleExtractor, extract_corpus
+from .kg.graph import KnowledgeGraph
+from .rag.llm import build_llm
+from .rag.pipelines import (
+    BaselineRAG,
+    BM25Retriever,
+    EnhancedRAG,
+    RandomRetriever,
+)
+from .represent.embedders import build_image_embedder, build_text_embedder
+
+log = logging.getLogger("sunrai_rag")
+
+
+def _setup_logging(verbose: bool = False) -> None:
+    logging.basicConfig(
+        level=logging.DEBUG if verbose else logging.INFO,
+        format="%(asctime)s %(levelname)-7s %(name)s | %(message)s",
+        datefmt="%H:%M:%S",
+    )
+
+
+def _paths(cfg):
+    art = Path(cfg.paths.artifacts_dir)
+    return {
+        "corpus": art / "corpus.json",
+        "text_index": art / "text_index",
+        "image_index": art / "image_index",
+        "kg": art / "kg.json",
+        "qa": art / "qa_set.json",
+        "cache": Path(cfg.paths.cache_dir) / "llm_cache.json",
+    }
+
+
+def _require(path: Path, stage: str) -> None:
+    if not path.exists():
+        sys.exit(f"Missing {path}. Run `python -m sunrai_rag.cli {stage}` first.")
+
+
+# ---------------------------------------------------------------- stages
+
+
+def cmd_ingest(cfg) -> None:
+    paths = _paths(cfg)
+    corpus = ingest(cfg)
+    corpus.save(paths["corpus"])
+    log.info(
+        "Ingested %d pages -> %d regions, %d chunks (OCR: %s)",
+        corpus.page_count, len(corpus.regions), len(corpus.chunks), corpus.ocr_stats,
+    )
+    log.info("Saved corpus to %s", paths["corpus"])
+
+
+def cmd_index(cfg) -> None:
+    paths = _paths(cfg)
+    _require(paths["corpus"], "ingest")
+    corpus = Corpus.load(paths["corpus"])
+
+    log.info("Embedding %d text chunks", len(corpus.chunks))
+    text_embedder = build_text_embedder(cfg)
+    text_vectors = text_embedder.embed_texts([c.text for c in corpus.chunks])
+    VectorStore(
+        [c.chunk_id for c in corpus.chunks], text_vectors, modality="text"
+    ).save(paths["text_index"])
+
+    visual = [r for r in corpus.visual_regions() if r.image_path]
+    if visual:
+        from PIL import Image
+
+        log.info("Embedding %d visual regions with CLIP", len(visual))
+        image_embedder = build_image_embedder(cfg)
+        images = [Image.open(r.image_path) for r in visual]
+        image_vectors = image_embedder.embed_images(images)
+        VectorStore(
+            [r.region_id for r in visual], image_vectors, modality="image"
+        ).save(paths["image_index"])
+    else:
+        log.warning("No visual regions with saved crops; skipping image index.")
+    log.info("Indices written to %s", cfg.paths.artifacts_dir)
+
+
+def cmd_kg(cfg) -> None:
+    paths = _paths(cfg)
+    _require(paths["corpus"], "ingest")
+    corpus = Corpus.load(paths["corpus"])
+
+    if cfg.kg.extractor == "llm":
+        extractor = LLMExtractor(llm=build_llm(cfg, paths["cache"]))
+    else:
+        extractor = RuleExtractor()
+
+    textual = [r for r in corpus.regions if r.is_textual and r.text]
+    log.info("Extracting KG from %d regions using %s", len(textual), cfg.kg.extractor)
+    extraction = extract_corpus(
+        textual, extractor, max_regions=cfg.kg.max_regions_for_extraction
+    )
+    kg = KnowledgeGraph.from_extraction(extraction)
+    kg.save(paths["kg"])
+    log.info("Knowledge graph: %s", json.dumps(kg.stats()))
+
+
+def _load_systems(cfg, corpus: Corpus):
+    paths = _paths(cfg)
+    _require(paths["text_index"], "index")
+    text_store = VectorStore.load(paths["text_index"])
+    text_embedder = build_text_embedder(cfg)
+    llm = build_llm(cfg, paths["cache"])
+
+    image_store = None
+    image_embedder = None
+    if paths["image_index"].exists():
+        image_store = VectorStore.load(paths["image_index"])
+        image_embedder = build_image_embedder(cfg)
+
+    kg = KnowledgeGraph.load(paths["kg"]) if paths["kg"].exists() else None
+
+    baseline = BaselineRAG(
+        chunks=corpus.chunks, text_store=text_store, text_embedder=text_embedder,
+        llm=llm, top_k=cfg.retrieval.top_k,
+    )
+    enhanced = EnhancedRAG(
+        chunks=corpus.chunks, regions=corpus.regions, text_store=text_store,
+        text_embedder=text_embedder, llm=llm, image_store=image_store,
+        image_embedder=image_embedder, kg=kg, top_k=cfg.retrieval.top_k,
+        candidate_k=cfg.retrieval.candidate_k, rrf_k=cfg.retrieval.rrf_k,
+        graph_hops=cfg.retrieval.graph_hops,
+        max_graph_regions=cfg.retrieval.max_graph_regions,
+    )
+    return baseline, enhanced, llm
+
+
+def cmd_build_qa(cfg) -> None:
+    paths = _paths(cfg)
+    _require(paths["corpus"], "ingest")
+    corpus = Corpus.load(paths["corpus"])
+    llm = build_llm(cfg, paths["cache"])
+    items = build_qa_set(
+        corpus.chunks, corpus.visual_regions(), llm,
+        n_per_type=cfg.eval.n_questions_per_type, seed=cfg.seed,
+    )
+    save_qa_set(items, paths["qa"])
+    log.info("QA set: %s", json.dumps(qa_set_stats(items)))
+
+
+def cmd_evaluate(cfg) -> None:
+    paths = _paths(cfg)
+    _require(paths["corpus"], "ingest")
+    _require(paths["qa"], "build-qa")
+    corpus = Corpus.load(paths["corpus"])
+    qa_items = load_qa_set(paths["qa"])
+    baseline, enhanced, llm = _load_systems(cfg, corpus)
+
+    systems = {"baseline": baseline, "enhanced": enhanced}
+
+    # Sanity floors. These exist to make a weak result visible: dense
+    # retrieval that fails to beat BM25 has not earned the "semantic"
+    # claim, and neither floor shows up in an absolute Recall number.
+    if cfg.retrieval.use_bm25_floor:
+        systems["bm25_floor"] = BM25Retriever(
+            BM25Index(
+                [c.chunk_id for c in corpus.chunks],
+                [c.text for c in corpus.chunks],
+            ),
+            top_k=cfg.retrieval.top_k,
+        )
+    if cfg.eval.include_random_floor:
+        systems["random_floor"] = RandomRetriever(
+            [c.chunk_id for c in corpus.chunks], seed=cfg.seed, top_k=cfg.retrieval.top_k
+        )
+
+    chunk_to_regions = {c.chunk_id: c.source_region_ids for c in corpus.chunks}
+    known_ids = {c.chunk_id for c in corpus.chunks} | {r.region_id for r in corpus.regions}
+
+    payload = run_comparison(
+        systems, qa_items, chunk_to_regions, known_ids, cfg,
+        judge_llm=llm if cfg.eval.judge_enabled else None,
+    )
+    csv_path = write_results(payload, cfg.paths.results_dir, cfg.eval.primary_k)
+    print(format_summary(payload, cfg.eval.primary_k))
+    log.info("Wrote %s", csv_path)
+
+
+def cmd_ask(cfg, question: str, system_name: str) -> None:
+    paths = _paths(cfg)
+    _require(paths["corpus"], "ingest")
+    corpus = Corpus.load(paths["corpus"])
+    baseline, enhanced, _ = _load_systems(cfg, corpus)
+    system = baseline if system_name == "baseline" else enhanced
+
+    answer = system.answer(question)
+    print(f"\nQ: {question}\nSystem: {answer.system_name}\n\n{answer.answer_text}\n")
+    print("Evidence:")
+    for item in answer.provenance.text_chunks:
+        print(f"  [text]  {item.item_id}  (score {item.score:.3f})")
+    for item in answer.provenance.visual_regions:
+        print(f"  [image] {item.item_id}  (score {item.score:.3f})")
+    if answer.provenance.graph_entities:
+        print(f"  [graph] entities: {', '.join(answer.provenance.graph_entities)}")
+        for path in answer.provenance.graph_paths:
+            print(f"          path: {' -> '.join(path)}")
+
+
+# ---------------------------------------------------------------- main
+
+
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(prog="sunrai_rag", description=__doc__)
+    parser.add_argument("stage", choices=[
+        "ingest", "index", "kg", "build-qa", "evaluate", "ask", "all",
+    ])
+    parser.add_argument("--config", default="configs/default.yaml")
+    parser.add_argument("-q", "--question", default=None)
+    parser.add_argument("--system", default="enhanced", choices=["baseline", "enhanced"])
+    parser.add_argument("-v", "--verbose", action="store_true")
+    args = parser.parse_args(argv)
+
+    _setup_logging(args.verbose)
+    cfg = load_config(args.config if Path(args.config).exists() else None)
+    set_global_seeds(cfg.seed)
+    cfg.ensure_dirs()
+    log.info("Config loaded (seed=%d, llm=%s)", cfg.seed, cfg.llm.backend)
+
+    if args.stage == "ingest":
+        cmd_ingest(cfg)
+    elif args.stage == "index":
+        cmd_index(cfg)
+    elif args.stage == "kg":
+        cmd_kg(cfg)
+    elif args.stage == "build-qa":
+        cmd_build_qa(cfg)
+    elif args.stage == "evaluate":
+        cmd_evaluate(cfg)
+    elif args.stage == "ask":
+        if not args.question:
+            sys.exit("ask requires -q/--question")
+        cmd_ask(cfg, args.question, args.system)
+    elif args.stage == "all":
+        cmd_ingest(cfg)
+        cmd_index(cfg)
+        cmd_kg(cfg)
+        cmd_build_qa(cfg)
+        cmd_evaluate(cfg)
+
+
+if __name__ == "__main__":
+    main()
