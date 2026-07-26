@@ -45,3 +45,12 @@ docker:     ## Build the container
 clean:      ## Remove generated artefacts (keeps results/)
 	rm -rf artifacts/ data/ .pytest_cache __pycache__
 	find . -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true
+
+fixtures:   ## Regenerate the rendered test pages
+	python scripts/make_fixtures.py tests/fixtures/pages
+
+verify-ocr: ## Run real Tesseract against known ground truth
+	python scripts/verify_ocr.py
+
+verify: test lint verify-ocr   ## Everything that can be checked offline
+	python scripts/smoke_e2e.py
