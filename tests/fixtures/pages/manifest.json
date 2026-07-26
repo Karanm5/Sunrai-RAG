@@ -1,0 +1,128 @@
+[
+  {
+    "key": "PMC5000000_00001",
+    "truth": [
+      {
+        "type": "title",
+        "expected_text": "Predictive modelling of clinical outcomes using random forest"
+      },
+      {
+        "type": "text",
+        "expected_text": "Abstract. We evaluate machine learning approaches for predicting patient outcomes in a prospective cohort. Models were trained on routinely collected clinical variables and validated using stratified cross validation across five folds."
+      },
+      {
+        "type": "text",
+        "expected_text": "Methods. A random forest was trained on the clinical cohort. Performance was assessed using accuracy and area under the curve. Complete numerical results are reported in Figure 1 below."
+      },
+      {
+        "type": "figure",
+        "expected_text": "Figure 1: accuracy of 80.5 percent achieved by the random forest"
+      },
+      {
+        "type": "text",
+        "expected_text": "Discussion. These findings suggest that routinely collected variables carry substantial predictive signal for this outcome."
+      }
+    ]
+  },
+  {
+    "key": "PMC5000000_00002",
+    "truth": [
+      {
+        "type": "text",
+        "expected_text": "Data collection. Records were gathered prospectively across three hospital sites over a twelve month period. Preprocessing followed standard normalisation and missing values were imputed."
+      },
+      {
+        "type": "table",
+        "expected_text": "Table 1: cohort characteristics for training and validation"
+      },
+      {
+        "type": "list",
+        "expected_text": "1. Inclusion required at least one recorded visit. 2. Patients under eighteen were excluded. 3. Incomplete records were removed before analysis."
+      }
+    ]
+  },
+  {
+    "key": "PMC5000001_00001",
+    "truth": [
+      {
+        "type": "title",
+        "expected_text": "Predictive modelling of clinical outcomes using convolutional neural network"
+      },
+      {
+        "type": "text",
+        "expected_text": "Abstract. We evaluate machine learning approaches for predicting patient outcomes in a prospective cohort. Models were trained on routinely collected clinical variables and validated using stratified cross validation across five folds."
+      },
+      {
+        "type": "text",
+        "expected_text": "Methods. A convolutional neural network was trained on the clinical cohort. Performance was assessed using accuracy and area under the curve. Complete numerical results are reported in Figure 1 below."
+      },
+      {
+        "type": "figure",
+        "expected_text": "Figure 1: accuracy of 84.5 percent achieved by the convolutional neural network"
+      },
+      {
+        "type": "text",
+        "expected_text": "Discussion. These findings suggest that routinely collected variables carry substantial predictive signal for this outcome."
+      }
+    ]
+  },
+  {
+    "key": "PMC5000001_00002",
+    "truth": [
+      {
+        "type": "text",
+        "expected_text": "Data collection. Records were gathered prospectively across three hospital sites over a twelve month period. Preprocessing followed standard normalisation and missing values were imputed."
+      },
+      {
+        "type": "table",
+        "expected_text": "Table 1: cohort characteristics for training and validation"
+      },
+      {
+        "type": "list",
+        "expected_text": "1. Inclusion required at least one recorded visit. 2. Patients under eighteen were excluded. 3. Incomplete records were removed before analysis."
+      }
+    ]
+  },
+  {
+    "key": "PMC5000002_00001",
+    "truth": [
+      {
+        "type": "title",
+        "expected_text": "Predictive modelling of clinical outcomes using support vector machine"
+      },
+      {
+        "type": "text",
+        "expected_text": "Abstract. We evaluate machine learning approaches for predicting patient outcomes in a prospective cohort. Models were trained on routinely collected clinical variables and validated using stratified cross validation across five folds."
+      },
+      {
+        "type": "text",
+        "expected_text": "Methods. A support vector machine was trained on the clinical cohort. Performance was assessed using accuracy and area under the curve. Complete numerical results are reported in Figure 1 below."
+      },
+      {
+        "type": "figure",
+        "expected_text": "Figure 1: accuracy of 88.5 percent achieved by the support vector machine"
+      },
+      {
+        "type": "text",
+        "expected_text": "Discussion. These findings suggest that routinely collected variables carry substantial predictive signal for this outcome."
+      }
+    ]
+  },
+  {
+    "key": "PMC5000002_00002",
+    "truth": [
+      {
+        "type": "text",
+        "expected_text": "Data collection. Records were gathered prospectively across three hospital sites over a twelve month period. Preprocessing followed standard normalisation and missing values were imputed."
+      },
+      {
+        "type": "table",
+        "expected_text": "Table 1: cohort characteristics for training and validation"
+      },
+      {
+        "type": "list",
+        "expected_text": "1. Inclusion required at least one recorded visit. 2. Patients under eighteen were excluded. 3. Incomplete records were removed before analysis."
+      }
+    ]
+  }
+]
