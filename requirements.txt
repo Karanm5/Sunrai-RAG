@@ -19,7 +19,8 @@ sentence-transformers==3.0.1
 transformers==4.44.2
 torch==2.4.1
 
-# --- generation backends (both optional at runtime) ---
+# --- generation backends (all optional at runtime; pick one) ---
+requests==2.32.3           # backend: groq / together / openrouter / ollama
 anthropic==0.34.2          # backend: anthropic
 accelerate==0.34.2         # backend: local
 

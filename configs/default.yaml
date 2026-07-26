@@ -37,12 +37,20 @@ models:
   device: auto
 
 llm:
-  backend: anthropic      # anthropic | local | stub
+  # anthropic | groq | together | openrouter | ollama | openai_compatible
+  # | local | stub.  For a free option see configs/groq.yaml.
+  backend: anthropic
   model: claude-sonnet-4-6
   local_model: Qwen/Qwen2.5-1.5B-Instruct
   max_tokens: 800
   temperature: 0.0        # must stay 0.0; validated in config.py
   cache_enabled: true     # makes evaluation reproducible AND free to re-run
+  # OpenAI-compatible providers only; blank means "use the provider preset".
+  base_url: ""
+  api_key_env: ""
+  requests_per_minute: 30 # client-side throttle for rate-limited free tiers
+  max_retries: 5
+  timeout_s: 90
 
 retrieval:
   top_k: 5

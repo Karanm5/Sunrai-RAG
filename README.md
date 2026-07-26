@@ -33,10 +33,41 @@ pip install -r requirements.txt
 # 2. Verify the install — offline, no models, no API key, ~1 second
 pytest tests/ -q
 
-# 3. Full pipeline
-export ANTHROPIC_API_KEY=...        # or set llm.backend: local in the config
+# 3. Full pipeline — pick a generation backend
+export GROQ_API_KEY=...             # free tier
+make all CONFIG=configs/groq.yaml
+
+# ...or Anthropic
+export ANTHROPIC_API_KEY=...
 make all
 ```
+
+### Choosing a generation backend
+
+One `OpenAICompatibleBackend` covers every hosted provider and any local
+server, because they all speak the same chat-completions wire format.
+Switching between a hosted model and one running on local hardware is a
+config edit, not a code change — which is the point when a platform has to
+run either way.
+
+| `llm.backend` | Endpoint | Key | Notes |
+|---|---|---|---|
+| `groq` | Groq | `GROQ_API_KEY` | free tier; rate-limited, throttled by default |
+| `anthropic` | Anthropic | `ANTHROPIC_API_KEY` | paid |
+| `together` / `openrouter` | those providers | respective | paid |
+| `ollama` | `localhost:11434` | any non-empty | fully local, no network |
+| `local` | in-process transformers | none | no server needed, slowest |
+| `stub` | none | none | tests and CI only |
+
+`configs/groq.yaml` is tuned for a free tier: rule-based KG extraction (which
+removes roughly 400 LLM calls), a 25 rpm client-side throttle, and caching so
+a re-run costs nothing. Rate limits are handled by pacing requests rather than
+tripping 429s and backing off; `Retry-After` is honoured when the server sends
+it, and a 4xx other than 429 fails immediately instead of burning the
+remaining quota on a request that will never succeed.
+
+Provider model names change — verify the current list before running. A
+retired model name returns HTTP 400, which fails fast with the message.
 
 `make all` runs: `ingest → index → kg → qa → evaluate`, writing
 `results/comparison.csv` and `results/results.json`.
@@ -147,10 +178,12 @@ introduce recall variance across builds and undermine the determinism the
 evaluation rests on. `FaissVectorStore` (also exact, `IndexFlatIP`) is
 included as the scaling path.
 
-**Pluggable LLM backend (`anthropic` | `local` | `stub`).** A platform that
-must run *on local systems or in the cloud* cannot hard-depend on a hosted
-model, so local-vs-API is a first-class config switch. The `stub` backend
-lets CI exercise the entire pipeline with no key and no network.
+**Pluggable LLM backend.** A platform that must run *on local systems or in
+the cloud* cannot hard-depend on one hosted provider, so the backend is a
+first-class config switch: Anthropic, any OpenAI-compatible provider (Groq,
+Together, OpenRouter), a local Ollama/vLLM server, an in-process transformers
+model, or a deterministic stub for CI. Rate-limited free tiers are supported
+with client-side throttling and `Retry-After`-aware backoff.
 
 **Cached LLM calls.** This is what makes an LLM pipeline reproducible: a
 re-run replays identical responses rather than resampling, and costs nothing.

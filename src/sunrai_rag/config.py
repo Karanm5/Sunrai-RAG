@@ -66,12 +66,21 @@ class ModelConfig:
 
 @dataclass
 class LLMConfig:
-    backend: str = "stub"  # "anthropic" | "local" | "stub"
+    # "anthropic" | "groq" | "together" | "openrouter" | "ollama"
+    # | "openai_compatible" | "local" | "stub"
+    backend: str = "stub"
     model: str = "claude-sonnet-4-6"
     local_model: str = "Qwen/Qwen2.5-1.5B-Instruct"
     max_tokens: int = 800
     temperature: float = 0.0
     cache_enabled: bool = True
+    # OpenAI-compatible providers only. Left blank, the provider preset fills
+    # these in; set them to override or to point at a self-hosted endpoint.
+    base_url: str = ""
+    api_key_env: str = ""
+    timeout_s: int = 90
+    max_retries: int = 5
+    requests_per_minute: int = 30  # client-side throttle; 0 disables
 
 
 @dataclass
@@ -204,8 +213,25 @@ def _validate(cfg: Config) -> None:
             f"eval.primary_k ({cfg.eval.primary_k}) must appear in "
             f"eval.k_values ({cfg.eval.k_values})."
         )
-    if cfg.llm.backend not in {"anthropic", "local", "stub"}:
-        raise ConfigError(f"Unknown llm.backend: {cfg.llm.backend!r}")
+    valid_backends = {
+        "anthropic", "groq", "together", "openrouter", "ollama",
+        "openai_compatible", "local", "stub",
+    }
+    if cfg.llm.backend not in valid_backends:
+        raise ConfigError(
+            f"Unknown llm.backend: {cfg.llm.backend!r}. "
+            f"Valid: {sorted(valid_backends)}"
+        )
+    if cfg.llm.backend == "openai_compatible" and not (
+        cfg.llm.base_url and cfg.llm.api_key_env
+    ):
+        raise ConfigError(
+            "llm.backend='openai_compatible' requires llm.base_url and "
+            "llm.api_key_env. Use a named preset (groq, together, ...) to "
+            "have them filled in automatically."
+        )
+    if cfg.llm.requests_per_minute < 0:
+        raise ConfigError("llm.requests_per_minute must be >= 0 (0 disables).")
     if cfg.kg.extractor not in {"llm", "rule"}:
         raise ConfigError(f"Unknown kg.extractor: {cfg.kg.extractor!r}")
     if cfg.chunk.strategy not in {"region", "window"}:

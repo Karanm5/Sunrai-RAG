@@ -1,0 +1,30 @@
+# Groq free-tier config.
+#
+# Groq's free tier is rate-limited, and this pipeline is call-heavy, so the
+# defaults below are tuned to finish comfortably inside the limits:
+#   * kg.extractor: rule    -> removes ~400 LLM calls entirely (biggest saving)
+#   * requests_per_minute   -> paces requests instead of tripping 429s
+#   * cache_enabled: true   -> a re-run costs zero calls
+#
+# Check Groq's current model list before running; model names change and a
+# retired name returns HTTP 400 (which fails fast rather than retrying).
+seed: 42
+
+llm:
+  backend: groq
+  model: llama-3.3-70b-versatile   # verify this is still current
+  max_tokens: 800
+  temperature: 0.0
+  cache_enabled: true
+  requests_per_minute: 25          # a little under the tier limit, for headroom
+  max_retries: 5
+  timeout_s: 90
+
+kg:
+  extractor: rule                  # free; switch to llm once the run works
+  max_regions_for_extraction: 300
+
+eval:
+  n_questions_per_type: 15         # raise to 25 once a full run succeeds
+  judge_enabled: true
+  judge_sample_size: 30
