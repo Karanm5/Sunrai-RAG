@@ -1,0 +1,14 @@
+# CI / offline smoke config: no network, no API key, no model downloads.
+seed: 42
+ingest:
+  max_pages: 5
+llm:
+  backend: stub
+kg:
+  extractor: rule
+eval:
+  k_values: [1, 3]
+  primary_k: 3
+  n_questions_per_type: 3
+  judge_enabled: false
+  judge_sample_size: 0
