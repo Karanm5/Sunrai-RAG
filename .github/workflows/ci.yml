@@ -1,0 +1,24 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # Minimal deps only: the suite is designed to run with no models,
+      # no network and no API key, so CI stays fast and deterministic.
+      - run: pip install -r requirements-min.txt
+      - name: Lint
+        run: ruff check src/ tests/
+      - name: Test
+        run: PYTHONPATH=src pytest tests/ -v
+      - name: Verify configs parse
+        run: |
+          PYTHONPATH=src python -c "
+          from sunrai_rag.config import load_config
+          for f in ['configs/default.yaml','configs/ci.yaml']:
+              load_config(f); print(f, 'OK')"
