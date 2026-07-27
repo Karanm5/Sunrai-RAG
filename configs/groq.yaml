@@ -2,7 +2,7 @@
 #
 # Groq's free tier is rate-limited, and this pipeline is call-heavy, so the
 # defaults below are tuned to finish comfortably inside the limits:
-#   * kg.extractor: rule    -> removes ~400 LLM calls entirely (biggest saving)
+#   * kg.batch_size: 5      -> 5x fewer requests for the same extraction
 #   * requests_per_minute   -> paces requests instead of tripping 429s
 #   * cache_enabled: true   -> a re-run costs zero calls
 #
@@ -21,10 +21,16 @@ llm:
   timeout_s: 90
 
 kg:
-  extractor: rule                  # free; switch to llm once the run works
-  max_regions_for_extraction: 300
+  # 'llm' is needed for anything outside ML vocabulary -- the rule extractor
+  # finds almost nothing in biomedical text. Batching keeps it affordable.
+  extractor: llm
+  max_regions_for_extraction: 200
+  batch_size: 5                    # regions per call; 5x fewer requests
 
 eval:
-  n_questions_per_type: 15         # raise to 25 once a full run succeeds
-  judge_enabled: true
-  judge_sample_size: 30
+  n_questions_per_type: 8
+  # Retrieval metrics need no LLM. Leave these false for the fast, zero-call
+  # run that produces the graded comparison; flip on for answer quality.
+  generate_answers: false
+  judge_enabled: false
+  judge_sample_size: 20
