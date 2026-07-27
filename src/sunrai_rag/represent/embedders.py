@@ -161,10 +161,13 @@ class CLIPEmbedder:
             batch = [im.convert("RGB") for im in images[start : start + self.batch_size]]
             inputs = processor(images=batch, return_tensors="pt")
             pixel_values = inputs["pixel_values"].to(model.device)
+            # _as_embedding may run a projection layer, so it must sit
+            # inside no_grad -- otherwise the result carries gradient
+            # tracking and .numpy() refuses to convert it.
             with torch.no_grad():
                 result = model.get_image_features(pixel_values=pixel_values)
-            features = self._as_embedding(result, model, "visual_projection")
-            out.append(features.cpu().numpy().astype(np.float32))
+                features = self._as_embedding(result, model, "visual_projection")
+            out.append(features.detach().cpu().numpy().astype(np.float32))
         return np.vstack(out)
 
     def embed_texts(self, texts: Sequence[str]) -> np.ndarray:
@@ -186,8 +189,8 @@ class CLIPEmbedder:
             }
             with torch.no_grad():
                 result = model.get_text_features(**model_inputs)
-            features = self._as_embedding(result, model, "text_projection")
-            out.append(features.cpu().numpy().astype(np.float32))
+                features = self._as_embedding(result, model, "text_projection")
+            out.append(features.detach().cpu().numpy().astype(np.float32))
         return np.vstack(out)
 
 

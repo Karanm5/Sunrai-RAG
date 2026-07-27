@@ -289,3 +289,40 @@ def test_clip_falls_back_to_cls_token():
 def test_clip_raises_on_unrecognised_output():
     with pytest.raises(RuntimeError, match="Could not extract embeddings"):
         _clip_extract(object(), object(), "visual_projection")
+
+
+def test_clip_embeddings_are_detached_from_autograd():
+    """Regression: the projection ran outside no_grad, so the result carried
+    gradient tracking and .numpy() refused to convert it.
+
+    Only bites when the model returns UNPROJECTED features, which is why it
+    surfaced on the text path while images worked.
+    """
+    import numpy as np
+    import torch
+
+    from sunrai_rag.represent.embedders import CLIPEmbedder
+
+    class _Processor:
+        def __call__(self, text=None, return_tensors=None, padding=None, truncation=None):
+            return {"input_ids": torch.ones(len(text), 4, dtype=torch.long),
+                    "attention_mask": torch.ones(len(text), 4, dtype=torch.long)}
+
+    class _Out:
+        def __init__(self, pooled): self.pooler_output = pooled
+
+    class _Model:
+        device = "cpu"
+        def __init__(self):
+            self.text_projection = torch.nn.Linear(768, 512, bias=False)
+        def get_text_features(self, **kwargs):
+            return _Out(torch.zeros(kwargs["input_ids"].shape[0], 768))
+
+    embedder = CLIPEmbedder()
+    embedder._model = _Model()
+    embedder._processor = _Processor()
+    embedder._ensure_model = lambda: (embedder._model, embedder._processor)
+
+    vectors = embedder.embed_texts(["a query"])
+    assert isinstance(vectors, np.ndarray)
+    assert vectors.shape == (1, 512)
