@@ -101,6 +101,7 @@ class KGConfig:
         default_factory=lambda: ["method", "metric", "dataset", "finding", "figure_ref"]
     )
     max_regions_for_extraction: int = 400
+    batch_size: int = 5  # regions per LLM call; 1 disables batching
 
 
 @dataclass

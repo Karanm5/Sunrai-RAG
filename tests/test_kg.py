@@ -223,3 +223,71 @@ def test_graph_roundtrip_preserves_structure_and_provenance(kg, tmp_path):
            kg.regions_for_node("method:random forest")
     assert loaded.expand(["method:random forest"], hops=2) == \
            kg.expand(["method:random forest"], hops=2)
+
+
+# ---------- batched extraction (rate-limit optimisation) ----------
+
+def _batch_response(n):
+    import json
+    return json.dumps({"results": [
+        {"index": i,
+         "entities": [{"name": f"method{i}", "type": "method"},
+                      {"name": "accuracy", "type": "metric"}],
+         "relations": [{"head": f"method{i}", "tail": "accuracy",
+                        "type": "evaluated_by"}]}
+        for i in range(n)]})
+
+
+def _regions(n):
+    return [_region("x" * 80, f"r{i}") for i in range(n)]
+
+
+def test_batching_reduces_api_calls():
+    """One call per region burns the request budget on repeated boilerplate."""
+    stub = StubBackend(responses={"Extract a knowledge graph from EACH": _batch_response(5)})
+    extract_corpus(_regions(10), LLMExtractor(llm=stub, batch_size=5))
+    assert len(stub.calls) == 2, f"expected 2 batched calls, got {len(stub.calls)}"
+
+
+def test_batching_preserves_per_region_provenance():
+    """Entities must still be attributed to the region they came from."""
+    stub = StubBackend(responses={"Extract a knowledge graph from EACH": _batch_response(3)})
+    result = extract_corpus(_regions(3), LLMExtractor(llm=stub, batch_size=3))
+    sources = {e.source_region_id for e in result.entities}
+    assert sources == {"r0", "r1", "r2"}
+
+
+def test_unparseable_batch_falls_back_per_region():
+    """A malformed batch costs accuracy on that batch, never the whole run."""
+    stub = StubBackend(responses={"Extract a knowledge graph from EACH": "not json",
+                                  "Extract a knowledge graph from this": '{"entities": [], "relations": []}'})
+    extract_corpus(_regions(3), LLMExtractor(llm=stub, batch_size=3))
+    assert len(stub.calls) == 4  # 1 failed batch + 3 individual retries
+
+
+def test_omitted_index_is_retried_individually():
+    """Models sometimes silently drop an excerpt; that region still gets tried."""
+    import json
+    partial = json.dumps({"results": [
+        {"index": 0, "entities": [{"name": "svm", "type": "method"}], "relations": []}]})
+    stub = StubBackend(responses={"Extract a knowledge graph from EACH": partial,
+                                  "Extract a knowledge graph from this": '{"entities": [], "relations": []}'})
+    extract_corpus(_regions(3), LLMExtractor(llm=stub, batch_size=3))
+    assert len(stub.calls) == 3  # 1 batch + 2 retries for the omitted indices
+
+
+def test_batch_ignores_out_of_range_indices():
+    import json
+    bad = json.dumps({"results": [
+        {"index": 99, "entities": [{"name": "ghost", "type": "method"}], "relations": []}]})
+    stub = StubBackend(responses={"Extract a knowledge graph from EACH": bad,
+                                  "Extract a knowledge graph from this": '{"entities": [], "relations": []}'})
+    result = extract_corpus(_regions(2), LLMExtractor(llm=stub, batch_size=2))
+    assert all("ghost" not in e.name for e in result.entities)
+
+
+def test_short_regions_excluded_from_batch():
+    stub = StubBackend(responses={"Extract a knowledge graph from EACH": _batch_response(1)})
+    regions = [_region("too short", "r0"), _region("x" * 80, "r1")]
+    extract_corpus(regions, LLMExtractor(llm=stub, batch_size=5))
+    assert "[0]" in stub.calls[0] and "[1]" not in stub.calls[0]

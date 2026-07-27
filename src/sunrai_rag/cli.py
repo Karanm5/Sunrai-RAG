@@ -113,7 +113,9 @@ def cmd_kg(cfg) -> None:
     corpus = Corpus.load(paths["corpus"])
 
     if cfg.kg.extractor == "llm":
-        extractor = LLMExtractor(llm=build_llm(cfg, paths["cache"]))
+        extractor = LLMExtractor(
+            llm=build_llm(cfg, paths["cache"]), batch_size=cfg.kg.batch_size
+        )
     else:
         extractor = RuleExtractor()
 
