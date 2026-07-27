@@ -111,6 +111,11 @@ class EvalConfig:
     judge_enabled: bool = True
     judge_sample_size: int = 60
     include_random_floor: bool = True
+    # Retrieval metrics need no LLM at all. Turning generation off gives the
+    # full baseline-vs-enhanced retrieval comparison in seconds and zero API
+    # calls, which is the graded core; answer quality can be measured in a
+    # separate, slower pass.
+    generate_answers: bool = True
 
 
 @dataclass

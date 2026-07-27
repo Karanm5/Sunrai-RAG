@@ -256,7 +256,7 @@ def run_comparison(
     allow_stub: bool = False,
 ) -> dict[str, Any]:
     """Evaluate every system and assemble the comparison payload."""
-    if cfg.llm.backend == "stub" and not allow_stub:
+    if cfg.llm.backend == "stub" and not allow_stub and cfg.eval.generate_answers:
         raise StubResultsError(
             "Refusing to produce headline results with the stub LLM backend. "
             "Set llm.backend to 'anthropic' or 'local' for reportable numbers, "
@@ -274,7 +274,7 @@ def run_comparison(
             k_values=cfg.eval.k_values,
             judge_llm=judge_llm if cfg.eval.judge_enabled else None,
             judge_sample_size=cfg.eval.judge_sample_size,
-            generate_answers=hasattr(system, "answer"),
+            generate_answers=cfg.eval.generate_answers and hasattr(system, "answer"),
         )
 
     payload: dict[str, Any] = {
@@ -287,6 +287,7 @@ def run_comparison(
             "kg_extractor": cfg.kg.extractor,
         },
         "n_questions": len(qa_items),
+        "generation_evaluated": cfg.eval.generate_answers,
         "systems": {label: result.to_dict() for label, result in results.items()},
     }
 

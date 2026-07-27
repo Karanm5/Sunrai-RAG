@@ -345,3 +345,37 @@ def test_summary_formats_without_error():
                              qa, {}, {"r1"}, cfg, allow_stub=True)
     text = format_summary(payload, primary_k=1)
     assert "RESULTS" in text and "DELTAS" in text
+
+
+def test_retrieval_only_mode_makes_no_llm_calls():
+    """The graded core -- the retrieval comparison -- needs no LLM.
+
+    Separating it means a full baseline-vs-enhanced result is available in
+    seconds and zero API calls, which matters on a rate-limited free tier.
+    """
+    cfg = Config()
+    cfg.llm.backend = "groq"
+    cfg.eval.k_values = [1, 3]
+    cfg.eval.primary_k = 3
+    cfg.eval.generate_answers = False
+    cfg.eval.judge_enabled = False
+
+    llm = StubBackend()
+    qa = [QAItem("q1", "a?", QueryType.VISUAL_REQUIRING, ["r1"])]
+    payload = run_comparison({"baseline": _FakeSystem("b", ["r1"]),
+                              "enhanced": _FakeSystem("e", ["r1"])},
+                             qa, {}, {"r1"}, cfg, judge_llm=llm)
+    assert llm.calls == [], "retrieval-only mode must not call the LLM"
+    assert payload["generation_evaluated"] is False
+    assert payload["systems"]["baseline"]["overall"]["recall"]["3"] == 1.0
+
+
+def test_results_record_whether_generation_was_evaluated():
+    cfg = Config()
+    cfg.llm.backend = "stub"
+    cfg.eval.k_values = [1]
+    cfg.eval.primary_k = 1
+    qa = [QAItem("q1", "a?", QueryType.TEXT_ANSWERABLE, ["r1"])]
+    payload = run_comparison({"baseline": _FakeSystem("b", ["r1"])},
+                             qa, {}, {"r1"}, cfg, allow_stub=True)
+    assert payload["generation_evaluated"] is True
