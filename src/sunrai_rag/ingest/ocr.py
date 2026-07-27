@@ -273,24 +273,41 @@ def ocr_regions(
     engine: OCREngine,
     min_chars: int = 20,
     cache: OCRCache | None = None,
+    ocr_visual_regions: bool = True,
 ) -> OCRStats:
-    """OCR every textual region in place; return quality statistics.
+    """OCR regions in place; return quality statistics.
 
     Regions whose OCR yields fewer than `min_chars` usable characters keep
     their text (for provenance) but are counted separately so the caller can
-    exclude them from the index. Visual regions are skipped entirely.
+    exclude them from the index.
+
+    `ocr_visual_regions` also reads tables and figures. Tables in particular
+    are mostly text, and without this the enhanced system retrieves the right
+    table and then hands the generator nothing but "table region on page 2".
+
+    Crucially this does NOT leak into the text index: `build_chunks` filters
+    on `is_textual`, so visual text is attached to the region for use as
+    retrieved evidence but never becomes a searchable chunk. That keeps the
+    baseline genuinely text-only and the comparison fair -- if table text
+    entered the shared index, the baseline would gain the very capability the
+    experiment is trying to isolate.
+
+    Statistics count textual regions only, so OCR quality figures stay
+    comparable across runs regardless of this setting.
     """
     stats = OCRStats()
     confidences: list[float] = []
 
     for region in regions:
-        if not region.is_textual:
+        if not region.is_textual and not (ocr_visual_regions and region.is_visual):
             continue
+        count_in_stats = region.is_textual
         crop = crops.get(region.region_id)
         if crop is None:
             continue
 
-        stats.attempted += 1
+        if count_in_stats:
+            stats.attempted += 1
         cached = cache.get(region.region_id) if cache else None
         if cached is not None:
             text, conf = cached
@@ -302,12 +319,13 @@ def ocr_regions(
 
         region.text = text
         region.ocr_confidence = conf
-        confidences.append(conf)
 
-        if not text:
-            stats.empty += 1
-        elif len(text) < min_chars:
-            stats.below_min_chars += 1
+        if count_in_stats:
+            confidences.append(conf)
+            if not text:
+                stats.empty += 1
+            elif len(text) < min_chars:
+                stats.below_min_chars += 1
 
     if confidences:
         stats.mean_confidence = sum(confidences) / len(confidences)

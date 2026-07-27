@@ -119,14 +119,17 @@ class _FakeEngine:
     def read(self, image): return self.mapping.get(image, ("", 0.0))
 
 
-def test_ocr_populates_text_and_skips_visual_regions():
+def test_ocr_populates_text_and_counts_only_textual_regions():
+    """Visual regions ARE read now (see the visual-OCR tests below), but they
+    are excluded from the quality statistics so figures stay comparable."""
     text_region = Region("r1", "d", "p", RegionType.TEXT, BBox(0, 0, 10, 10))
     figure_region = Region("r2", "d", "p", RegionType.FIGURE, BBox(0, 0, 10, 10))
-    engine = _FakeEngine({"img1": ("Hello world of science", 0.9)})
+    engine = _FakeEngine({"img1": ("Hello world of science", 0.9),
+                          "img2": ("Figure 1: some caption text", 0.8)})
     stats = ocr_regions([text_region, figure_region], {"r1": "img1", "r2": "img2"}, engine)
     assert text_region.text == "Hello world of science"
-    assert figure_region.text is None          # visual regions untouched
-    assert stats.attempted == 1                # figure not attempted
+    assert figure_region.text == "Figure 1: some caption text"
+    assert stats.attempted == 1  # textual only
 
 
 def test_ocr_stats_track_empty_and_short_results():
@@ -333,3 +336,55 @@ def test_returns_none_when_nothing_found(monkeypatch):
     monkeypatch.setattr(shutil, "which", lambda name: None)
     monkeypatch.setattr(os.path, "isfile", lambda p: False)
     assert ocr_mod.find_tesseract_binary() is None
+
+
+# ---------- visual-region OCR must not contaminate the text index ----------
+
+def test_visual_regions_get_ocr_text():
+    """Tables are mostly text; without this the generator receives nothing."""
+    text_r = Region("t1", "d", "p", RegionType.TEXT, BBox(0, 0, 99, 99))
+    table_r = Region("v1", "d", "p", RegionType.TABLE, BBox(0, 0, 99, 99))
+    engine = _FakeEngine({"a": ("Table 1: mean BMI 24.3 and WC 88.1 cm", 0.9),
+                          "b": ("Table 1: mean BMI 24.3 and WC 88.1 cm", 0.9)})
+    ocr_regions([text_r, table_r], {"t1": "a", "v1": "b"}, engine)
+    assert table_r.text and "BMI" in table_r.text
+
+
+def test_visual_ocr_can_be_disabled():
+    table_r = Region("v1", "d", "p", RegionType.TABLE, BBox(0, 0, 99, 99))
+    engine = _FakeEngine({"b": ("some table text here", 0.9)})
+    ocr_regions([table_r], {"v1": "b"}, engine, ocr_visual_regions=False)
+    assert table_r.text is None
+
+
+def test_visual_ocr_never_reaches_the_text_index(config):
+    """The fairness guarantee.
+
+    If table text entered the shared chunk index, the baseline would gain the
+    exact capability the experiment isolates, and the comparison would be
+    meaningless. Visual text stays attached to the region only.
+    """
+    text_r = Region("PMC1_00001#r000", "PMC1", "00001", RegionType.TEXT,
+                    BBox(0, 0, 99, 99))
+    table_r = Region("PMC1_00001#r001", "PMC1", "00001", RegionType.TABLE,
+                     BBox(0, 0, 99, 99))
+    engine = _FakeEngine({"a": ("Body text long enough to be indexed here.", 0.9),
+                          "b": ("Table 1: mean BMI 24.3 and WC 88.1 cm", 0.9)})
+    ocr_regions([text_r, table_r], {"PMC1_00001#r000": "a",
+                                    "PMC1_00001#r001": "b"}, engine)
+    chunks = build_chunks([text_r, table_r], config)
+    cited = {rid for c in chunks for rid in c.source_region_ids}
+    assert table_r.region_id not in cited
+    assert text_r.region_id in cited
+
+
+def test_ocr_stats_ignore_visual_regions():
+    """Quality figures must stay comparable regardless of the setting."""
+    text_r = Region("t1", "d", "p", RegionType.TEXT, BBox(0, 0, 99, 99))
+    tables = [Region(f"v{i}", "d", "p", RegionType.TABLE, BBox(0, 0, 99, 99))
+              for i in range(3)]
+    engine = _FakeEngine({k: ("text of sufficient length for the check", 0.9)
+                          for k in ["a", "b", "c", "d"]})
+    crops = {"t1": "a", "v0": "b", "v1": "c", "v2": "d"}
+    stats = ocr_regions([text_r, *tables], crops, engine)
+    assert stats.attempted == 1
