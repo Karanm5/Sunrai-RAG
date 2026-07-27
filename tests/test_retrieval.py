@@ -188,3 +188,63 @@ def test_dedupe_keeps_best_ranked_occurrence():
              ScoredItem("b", 0.5, "text", 3)]
     out = dedupe_preserving_order(items)
     assert _ids(out) == ["a", "b"] and out[0].score == 0.9
+
+
+# ---------- CLIP output-shape compatibility ----------
+
+class _FakeTensor:
+    """Minimal stand-in for a torch tensor."""
+    def __init__(self, data): self.data = data
+    def cpu(self): return self
+    def numpy(self):
+        import numpy as _np
+        return _np.array(self.data, dtype=_np.float32)
+
+
+class _Wrapper:
+    """Mimics transformers returning a ModelOutput instead of a tensor."""
+    def __init__(self, pooler_output=None, image_embeds=None):
+        self.pooler_output = pooler_output
+        if image_embeds is not None:
+            self.image_embeds = image_embeds
+
+
+def _clip_extract(result, model, projection):
+    from sunrai_rag.represent.embedders import CLIPEmbedder
+    return CLIPEmbedder._as_embedding(result, model, projection)
+
+
+def test_clip_passes_through_a_plain_tensor(monkeypatch):
+    import torch
+    t = torch.zeros(2, 512)
+    assert _clip_extract(t, object(), "visual_projection") is t
+
+
+def test_clip_unwraps_image_embeds(monkeypatch):
+    import torch
+    embeds = torch.zeros(2, 512)
+    out = _clip_extract(_Wrapper(image_embeds=embeds), object(), "visual_projection")
+    assert out is embeds
+
+
+def test_clip_projects_pooler_output_to_shared_space():
+    """The correctness trap: pooler_output is PRE-projection (768-dim).
+
+    Using it directly would leave image vectors in a different space from
+    text vectors, and cross-modal retrieval would silently return nonsense.
+    """
+    import torch
+
+    class _Model:
+        def __init__(self):
+            self.visual_projection = torch.nn.Linear(768, 512, bias=False)
+
+    model = _Model()
+    pooled = torch.zeros(2, 768)
+    out = _clip_extract(_Wrapper(pooler_output=pooled), model, "visual_projection")
+    assert out.shape == (2, 512), "must be projected into the shared 512-dim space"
+
+
+def test_clip_raises_on_unrecognised_output():
+    with pytest.raises(RuntimeError, match="Could not extract embeddings"):
+        _clip_extract(object(), object(), "visual_projection")

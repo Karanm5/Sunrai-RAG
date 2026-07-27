@@ -89,6 +89,39 @@ class CLIPEmbedder:
             self.dim = int(self._model.config.projection_dim)
         return self._model, self._processor
 
+    @staticmethod
+    def _as_embedding(result: Any, model: Any, projection_name: str) -> Any:
+        """Coerce a CLIP feature call into a projected embedding tensor.
+
+        `get_image_features` / `get_text_features` normally return a tensor,
+        but some transformers versions return a ModelOutput wrapper instead.
+        Unwrapping it naively to `pooler_output` would be a silent
+        correctness bug: that is the *pre-projection* hidden state (768-dim
+        for ViT-B/32), while the other modality would still be projected
+        (512-dim). The two would no longer share a space, and cross-modal
+        retrieval would quietly return meaningless results.
+
+        So when we get a wrapper, we apply the projection ourselves.
+        """
+        import torch
+
+        if torch.is_tensor(result):
+            return result
+        embeds = getattr(result, "image_embeds", None)
+        if embeds is None:
+            embeds = getattr(result, "text_embeds", None)
+        if embeds is not None and torch.is_tensor(embeds):
+            return embeds
+        pooled = getattr(result, "pooler_output", None)
+        if pooled is None:
+            raise RuntimeError(
+                f"Could not extract embeddings from CLIP output of type "
+                f"{type(result)}. Expected a tensor, image_embeds/text_embeds, "
+                "or pooler_output."
+            )
+        projection = getattr(model, projection_name)
+        return projection(pooled)
+
     def embed_images(self, images: Sequence[Any]) -> np.ndarray:
         if not images:
             return np.zeros((0, self.dim), dtype=np.float32)
@@ -99,9 +132,10 @@ class CLIPEmbedder:
         for start in range(0, len(images), self.batch_size):
             batch = [im.convert("RGB") for im in images[start : start + self.batch_size]]
             inputs = processor(images=batch, return_tensors="pt")
-            inputs = {k: v.to(model.device) for k, v in inputs.items()}
+            pixel_values = inputs["pixel_values"].to(model.device)
             with torch.no_grad():
-                features = model.get_image_features(**inputs)
+                result = model.get_image_features(pixel_values=pixel_values)
+            features = self._as_embedding(result, model, "visual_projection")
             out.append(features.cpu().numpy().astype(np.float32))
         return np.vstack(out)
 
@@ -117,9 +151,14 @@ class CLIPEmbedder:
             inputs = processor(
                 text=batch, return_tensors="pt", padding=True, truncation=True
             )
-            inputs = {k: v.to(model.device) for k, v in inputs.items()}
+            model_inputs = {
+                k: v.to(model.device)
+                for k, v in inputs.items()
+                if k in ("input_ids", "attention_mask")
+            }
             with torch.no_grad():
-                features = model.get_text_features(**inputs)
+                result = model.get_text_features(**model_inputs)
+            features = self._as_embedding(result, model, "text_projection")
             out.append(features.cpu().numpy().astype(np.float32))
         return np.vstack(out)
 
