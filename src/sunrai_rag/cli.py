@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -233,10 +234,129 @@ def cmd_ask(cfg, question: str, system_name: str) -> None:
 # ---------------------------------------------------------------- main
 
 
+def cmd_doctor(cfg) -> int:
+    """Check the environment before a long run fails halfway through.
+
+    Every problem hit during this project's bring-up -- a missing tesseract
+    binary, an absent optional dependency, an unset API key, a retired model
+    name -- announced itself only after minutes of work had already been
+    spent. This checks all of them up front, on any platform, in seconds.
+
+    Returns the number of blocking problems found.
+    """
+    import platform
+    import shutil
+
+    ok, warn, fail = "  OK  ", " WARN ", " FAIL "
+    problems = 0
+
+    print("=" * 62)
+    print("ENVIRONMENT CHECK")
+    print("=" * 62)
+    print(f"{ok}python {platform.python_version()} on {platform.system()}")
+
+    # --- required imports -------------------------------------------------
+    required = {
+        "numpy": "numpy", "yaml": "pyyaml", "networkx": "networkx",
+        "PIL": "pillow", "datasets": "datasets", "requests": "requests",
+    }
+    optional = {
+        "pytesseract": "pytesseract (needed for ingest)",
+        "sentence_transformers": "sentence-transformers (needed for index)",
+        "transformers": "transformers (needed for index)",
+        "torch": "torch (needed for index)",
+    }
+    for module, package in required.items():
+        try:
+            __import__(module)
+            print(f"{ok}{package}")
+        except ImportError:
+            print(f"{fail}{package} missing  ->  pip install {package}")
+            problems += 1
+    for module, label in optional.items():
+        try:
+            __import__(module)
+            print(f"{ok}{label}")
+        except ImportError:
+            print(f"{warn}{label} missing")
+
+    # --- tesseract binary -------------------------------------------------
+    from .ingest.ocr import find_tesseract_binary
+
+    path = find_tesseract_binary(cfg.ingest.tesseract_cmd or None)
+    if path:
+        print(f"{ok}tesseract at {path}")
+    else:
+        print(f"{fail}tesseract not found")
+        print("        Windows: https://github.com/UB-Mannheim/tesseract/wiki")
+        print("        macOS:   brew install tesseract")
+        print("        Linux:   sudo apt-get install tesseract-ocr tesseract-ocr-eng")
+        problems += 1
+
+    # --- generation backend ----------------------------------------------
+    backend = cfg.llm.backend
+    if backend in ("stub", "local"):
+        print(f"{ok}llm backend '{backend}' needs no API key")
+    else:
+        env_var = cfg.llm.api_key_env or {
+            "anthropic": "ANTHROPIC_API_KEY", "groq": "GROQ_API_KEY",
+            "together": "TOGETHER_API_KEY", "openrouter": "OPENROUTER_API_KEY",
+        }.get(backend, "")
+        if env_var and os.environ.get(env_var):
+            print(f"{ok}{env_var} is set")
+            if backend == "groq":
+                _check_groq_model(cfg, ok, fail)
+        elif env_var:
+            print(f"{fail}{env_var} is not set")
+            print(f"        export {env_var}=your_key_here")
+            problems += 1
+
+    # --- disk -------------------------------------------------------------
+    free_gb = shutil.disk_usage(".").free / 1e9
+    if free_gb < 3:
+        print(f"{warn}only {free_gb:.1f} GB free; models need ~2 GB")
+    else:
+        print(f"{ok}{free_gb:.1f} GB disk free")
+
+    print("=" * 62)
+    if problems:
+        print(f"{problems} blocking problem(s). Fix these before running.")
+    else:
+        print("All good. Run:  sunrai-rag ingest --config <your config>")
+    print("=" * 62)
+    return problems
+
+
+def _check_groq_model(cfg, ok: str, fail: str) -> None:
+    """Confirm the configured model still exists; providers retire them."""
+    try:
+        import requests
+
+        response = requests.get(
+            f"{cfg.llm.base_url or 'https://api.groq.com/openai/v1'}/models",
+            headers={"Authorization": f"Bearer {os.environ['GROQ_API_KEY']}"},
+            timeout=15,
+        )
+        if response.status_code != 200:
+            print(f"{fail}could not list models (HTTP {response.status_code})")
+            return
+        available = sorted(m["id"] for m in response.json().get("data", []))
+        if cfg.llm.model in available:
+            print(f"{ok}model '{cfg.llm.model}' is available")
+        else:
+            print(f"{fail}model '{cfg.llm.model}' is NOT available")
+            print("        Pick one of these and set llm.model in your config:")
+            for name in available[:12]:
+                print(f"          {name}")
+    except Exception as exc:  # network flake should not fail the whole check
+        print(f"        (could not verify model: {exc})")
+
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="sunrai_rag", description=__doc__)
     parser.add_argument("stage", choices=[
-        "ingest", "index", "kg", "build-qa", "evaluate", "ask", "all",
+        "doctor", "ingest", "index", "kg", "build-qa", "evaluate", "ask", "all",
     ])
     parser.add_argument("--config", default="configs/default.yaml")
     parser.add_argument("-q", "--question", default=None)
@@ -250,6 +370,8 @@ def main(argv: list[str] | None = None) -> None:
     cfg.ensure_dirs()
     log.info("Config loaded (seed=%d, llm=%s)", cfg.seed, cfg.llm.backend)
 
+    if args.stage == "doctor":
+        raise SystemExit(1 if cmd_doctor(cfg) else 0)
     if args.stage == "ingest":
         cmd_ingest(cfg)
     elif args.stage == "index":

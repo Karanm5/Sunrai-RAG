@@ -8,6 +8,12 @@ version = "1.0.0"
 description = "Multimodal + knowledge-graph RAG over PubLayNet, with a segmented baseline comparison"
 requires-python = ">=3.10"
 
+# Installing the package (pip install -e .) puts it on the import path, so
+# no PYTHONPATH juggling is needed and the same command works identically on
+# Windows, macOS, Linux and CI.
+[project.scripts]
+sunrai-rag = "sunrai_rag.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
