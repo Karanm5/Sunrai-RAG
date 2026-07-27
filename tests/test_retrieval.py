@@ -227,11 +227,25 @@ def test_clip_unwraps_image_embeds(monkeypatch):
     assert out is embeds
 
 
-def test_clip_projects_pooler_output_to_shared_space():
-    """The correctness trap: pooler_output is PRE-projection (768-dim).
+def test_clip_projects_raw_pooler_output():
+    """768-dim pooler_output is pre-projection and must be projected."""
+    import torch
 
-    Using it directly would leave image vectors in a different space from
-    text vectors, and cross-modal retrieval would silently return nonsense.
+    class _Model:
+        def __init__(self):
+            self.visual_projection = torch.nn.Linear(768, 512, bias=False)
+
+    out = _clip_extract(_Wrapper(pooler_output=torch.zeros(2, 768)),
+                        _Model(), "visual_projection")
+    assert out.shape == (2, 512)
+
+
+def test_clip_leaves_already_projected_output_alone():
+    """512-dim pooler_output is ALREADY projected.
+
+    Projecting it again is a shape error at best; treating the two modalities
+    inconsistently is a silent correctness bug at worst. Decided by measuring
+    the dimension, not by assuming.
     """
     import torch
 
@@ -239,10 +253,37 @@ def test_clip_projects_pooler_output_to_shared_space():
         def __init__(self):
             self.visual_projection = torch.nn.Linear(768, 512, bias=False)
 
-    model = _Model()
-    pooled = torch.zeros(2, 768)
-    out = _clip_extract(_Wrapper(pooler_output=pooled), model, "visual_projection")
-    assert out.shape == (2, 512), "must be projected into the shared 512-dim space"
+    pooled = torch.zeros(7, 512)
+    out = _clip_extract(_Wrapper(pooler_output=pooled), _Model(), "visual_projection")
+    assert out is pooled, "already-projected features must pass through untouched"
+
+
+def test_clip_refuses_to_guess_on_unexpected_dimension():
+    import torch
+
+    class _Model:
+        def __init__(self):
+            self.visual_projection = torch.nn.Linear(768, 512, bias=False)
+
+    with pytest.raises(RuntimeError, match="matches neither"):
+        _clip_extract(_Wrapper(pooler_output=torch.zeros(2, 999)),
+                      _Model(), "visual_projection")
+
+
+def test_clip_falls_back_to_cls_token():
+    import torch
+
+    class _Out:
+        def __init__(self):
+            self.last_hidden_state = torch.zeros(2, 50, 768)
+            self.pooler_output = None
+
+    class _Model:
+        def __init__(self):
+            self.visual_projection = torch.nn.Linear(768, 512, bias=False)
+
+    out = _clip_extract(_Out(), _Model(), "visual_projection")
+    assert out.shape == (2, 512)
 
 
 def test_clip_raises_on_unrecognised_output():

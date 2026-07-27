@@ -94,33 +94,61 @@ class CLIPEmbedder:
         """Coerce a CLIP feature call into a projected embedding tensor.
 
         `get_image_features` / `get_text_features` normally return a tensor,
-        but some transformers versions return a ModelOutput wrapper instead.
-        Unwrapping it naively to `pooler_output` would be a silent
-        correctness bug: that is the *pre-projection* hidden state (768-dim
-        for ViT-B/32), while the other modality would still be projected
-        (512-dim). The two would no longer share a space, and cross-modal
-        retrieval would quietly return meaningless results.
+        but some transformers versions return a ModelOutput wrapper instead,
+        and what sits inside that wrapper is not consistent across versions:
+        `pooler_output` is sometimes the raw 768-dim vision state and
+        sometimes the already-projected 512-dim embedding.
 
-        So when we get a wrapper, we apply the projection ourselves.
+        Guessing wrong is not a crash you can ignore -- it is a silent
+        correctness bug. If one modality ends up projected and the other does
+        not, they no longer share a space and cross-modal retrieval returns
+        meaningless results while appearing to work.
+
+        So we decide by *measuring*: compare the tensor's last dimension
+        against the projection layer's in/out features and only project when
+        the shapes say it is needed.
         """
         import torch
 
         if torch.is_tensor(result):
             return result
-        embeds = getattr(result, "image_embeds", None)
-        if embeds is None:
-            embeds = getattr(result, "text_embeds", None)
-        if embeds is not None and torch.is_tensor(embeds):
-            return embeds
+
+        # Preferred: the wrapper exposes the projected embedding directly.
+        for attr in ("image_embeds", "text_embeds"):
+            embeds = getattr(result, attr, None)
+            if embeds is not None and torch.is_tensor(embeds):
+                return embeds
+
         pooled = getattr(result, "pooler_output", None)
         if pooled is None:
+            hidden = getattr(result, "last_hidden_state", None)
+            if hidden is not None and torch.is_tensor(hidden) and hidden.ndim == 3:
+                pooled = hidden[:, 0, :]  # CLS token
+        if pooled is None or not torch.is_tensor(pooled):
             raise RuntimeError(
                 f"Could not extract embeddings from CLIP output of type "
                 f"{type(result)}. Expected a tensor, image_embeds/text_embeds, "
-                "or pooler_output."
+                "pooler_output, or last_hidden_state."
             )
-        projection = getattr(model, projection_name)
-        return projection(pooled)
+
+        projection = getattr(model, projection_name, None)
+        if projection is None:
+            return pooled
+
+        last_dim = int(pooled.shape[-1])
+        in_features = getattr(projection, "in_features", None)
+        out_features = getattr(projection, "out_features", None)
+
+        if in_features is not None and last_dim == in_features:
+            return projection(pooled)  # raw state -> shared space
+        if out_features is not None and last_dim == out_features:
+            return pooled  # already in the shared space
+        raise RuntimeError(
+            f"CLIP output has last dimension {last_dim}, which matches neither "
+            f"the projection input ({in_features}) nor its output "
+            f"({out_features}). Refusing to guess, since a wrong choice would "
+            "silently break cross-modal retrieval."
+        )
 
     def embed_images(self, images: Sequence[Any]) -> np.ndarray:
         if not images:
