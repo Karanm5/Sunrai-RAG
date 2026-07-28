@@ -92,6 +92,8 @@ class RetrievalConfig:
     use_bm25_floor: bool = True
     graph_hops: int = 1
     max_graph_regions: int = 5
+    text_weight: float = 1.0
+    graph_weight: float = 0.3  # graph fused below text; parity displaced good hits
 
 
 @dataclass

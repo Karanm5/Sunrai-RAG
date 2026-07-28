@@ -55,6 +55,7 @@ def _paths(cfg):
         "corpus": art / "corpus.json",
         "text_index": art / "text_index",
         "image_index": art / "image_index",
+        "visual_text_index": art / "visual_text_index",
         "kg": art / "kg.json",
         "qa": art / "qa_set.json",
         "cache": Path(cfg.paths.cache_dir) / "llm_cache.json",
@@ -91,6 +92,21 @@ def cmd_index(cfg) -> None:
     VectorStore(
         [c.chunk_id for c in corpus.chunks], text_vectors, modality="text"
     ).save(paths["text_index"])
+
+    # Dense index over OCR'd text from tables and figures. This is the
+    # retrieval route that actually works on scientific documents; CLIP over
+    # raw crops performs at chance on them.
+    visual_with_text = [r for r in corpus.visual_regions() if (r.text or "").strip()]
+    if visual_with_text:
+        log.info("Embedding OCR text from %d visual regions", len(visual_with_text))
+        visual_vectors = text_embedder.embed_texts(
+            [r.text or "" for r in visual_with_text]
+        )
+        VectorStore(
+            [r.region_id for r in visual_with_text], visual_vectors, modality="image"
+        ).save(paths["visual_text_index"])
+    else:
+        log.warning("No OCR text on visual regions; skipping visual-text index.")
 
     visual = [r for r in corpus.visual_regions() if r.image_path]
     if visual:
@@ -143,6 +159,12 @@ def _load_systems(cfg, corpus: Corpus):
         image_store = VectorStore.load(paths["image_index"])
         image_embedder = build_image_embedder(cfg)
 
+    visual_text_store = (
+        VectorStore.load(paths["visual_text_index"])
+        if paths["visual_text_index"].exists()
+        else None
+    )
+
     kg = KnowledgeGraph.load(paths["kg"]) if paths["kg"].exists() else None
 
     baseline = BaselineRAG(
@@ -152,10 +174,13 @@ def _load_systems(cfg, corpus: Corpus):
     enhanced = EnhancedRAG(
         chunks=corpus.chunks, regions=corpus.regions, text_store=text_store,
         text_embedder=text_embedder, llm=llm, image_store=image_store,
-        image_embedder=image_embedder, kg=kg, top_k=cfg.retrieval.top_k,
+        image_embedder=image_embedder, visual_text_store=visual_text_store,
+        kg=kg, top_k=cfg.retrieval.top_k,
         candidate_k=cfg.retrieval.candidate_k, rrf_k=cfg.retrieval.rrf_k,
         graph_hops=cfg.retrieval.graph_hops,
         max_graph_regions=cfg.retrieval.max_graph_regions,
+        text_weight=cfg.retrieval.text_weight,
+        graph_weight=cfg.retrieval.graph_weight,
     )
     return baseline, enhanced, llm
 

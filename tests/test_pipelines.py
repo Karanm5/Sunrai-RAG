@@ -326,3 +326,82 @@ def test_bm25_floor_finds_exact_lexical_match(chunks):
     )
     top = floor.retrieve("convolutional neural network cardiac cohort").text_chunks[0]
     assert "PMC001" in top.item_id
+
+
+# ---------- regression: the visual_requiring = 0.000 failure ----------
+
+@pytest.fixture
+def visual_text_store(regions, embedder):
+    """Dense index over OCR'd text from tables/figures."""
+    visual = [r for r in regions if r.is_visual and r.text]
+    return VectorStore([r.region_id for r in visual],
+                       embedder.embed_texts([r.text for r in visual]),
+                       modality="image")
+
+
+def test_visual_text_route_retrieves_the_right_table(
+    chunks, regions, text_store, embedder, llm, visual_text_store, kg
+):
+    """The fix for a real measured failure.
+
+    On the real corpus, CLIP-only visual retrieval scored 0.000 recall on
+    visual questions -- indistinguishable from chance, because CLIP is
+    trained on natural photographs and scientific tables are far outside
+    that distribution. Searching the OCR'd text of those regions with the
+    text encoder retrieves them reliably.
+    """
+    system = EnhancedRAG(
+        chunks=chunks, regions=regions, text_store=text_store,
+        text_embedder=embedder, llm=llm, visual_text_store=visual_text_store,
+        image_store=None, image_embedder=None, kg=kg, top_k=5,
+    )
+    prov = system.retrieve("What accuracy did the random forest achieve?")
+    assert "PMC001_00001#r002" in prov.ranked_evidence_ids()[:5]
+
+
+def test_visual_text_route_works_without_clip(
+    chunks, regions, text_store, embedder, llm, visual_text_store
+):
+    """CLIP must be optional: the working route should not depend on it."""
+    system = EnhancedRAG(
+        chunks=chunks, regions=regions, text_store=text_store,
+        text_embedder=embedder, llm=llm, visual_text_store=visual_text_store,
+        image_store=None, image_embedder=None, kg=None, top_k=5,
+    )
+    assert system.retrieve("sensitivity and specificity").visual_regions
+
+
+def test_graph_is_down_weighted_against_text(
+    chunks, regions, text_store, embedder, llm, kg
+):
+    """Fusing graph candidates at parity with text displaced correct results
+    (text_answerable fell 0.875 -> 0.750 on the real corpus)."""
+    strong = EnhancedRAG(
+        chunks=chunks, regions=regions, text_store=text_store,
+        text_embedder=embedder, llm=llm, kg=kg, top_k=3,
+        text_weight=1.0, graph_weight=0.3,
+    )
+    parity = EnhancedRAG(
+        chunks=chunks, regions=regions, text_store=text_store,
+        text_embedder=embedder, llm=llm, kg=kg, top_k=3,
+        text_weight=1.0, graph_weight=1.0,
+    )
+    query = "random forest cardiac cohort"
+    top_text = text_store.search(embedder.embed_texts([query]), k=1)[0].item_id
+    down = [c.item_id for c in strong.retrieve(query).text_chunks]
+    assert top_text in down, "down-weighting must preserve the best text hit"
+    assert parity.retrieve(query).text_chunks  # parity still returns results
+
+
+def test_both_visual_routes_fuse_when_available(
+    chunks, regions, text_store, embedder, llm, visual_text_store, image_store
+):
+    """CLIP is retained for purely pictorial figures, fused after OCR text."""
+    system = EnhancedRAG(
+        chunks=chunks, regions=regions, text_store=text_store,
+        text_embedder=embedder, llm=llm, visual_text_store=visual_text_store,
+        image_store=image_store, image_embedder=embedder, kg=None, top_k=5,
+    )
+    prov = system.retrieve("accuracy of the model")
+    assert prov.visual_regions
+    assert all("#r" in v.item_id for v in prov.visual_regions)

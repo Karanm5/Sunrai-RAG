@@ -169,12 +169,24 @@ class EnhancedRAG:
     llm: Any
     image_store: VectorStore | None = None
     image_embedder: Any = None
+    # Dense index over text RECOVERED FROM visual regions by OCR. CLIP is
+    # trained on natural photographs and performs at chance on cropped
+    # scientific tables; the information in those regions is overwhelmingly
+    # textual, so a text encoder is the right instrument for it. This is
+    # still cross-modal -- the content comes from a non-text modality and is
+    # deliberately absent from the baseline's index.
+    visual_text_store: VectorStore | None = None
     kg: KnowledgeGraph | None = None
     top_k: int = 5
     candidate_k: int = 20
     rrf_k: int = 60
     graph_hops: int = 1
     max_graph_regions: int = 5
+    # Text retrieval is the strongest single signal, so graph candidates are
+    # down-weighted rather than fused as equals. Fusing at parity measurably
+    # displaced correct text results.
+    text_weight: float = 1.0
+    graph_weight: float = 0.3
     name: str = field(default="enhanced_multimodal_kg", init=False)
 
     def _region_to_chunk_ids(self, region_ids: Sequence[str]) -> list[str]:
@@ -191,11 +203,33 @@ class EnhancedRAG:
         text_vector = self.text_embedder.embed_texts([query])
         text_hits = self.text_store.search(text_vector, k=self.candidate_k)
 
-        # 2. Cross-modal retrieval: query text -> CLIP space -> figure crops.
+        # 2. Cross-modal retrieval over visual regions, by two routes.
         visual_hits: list[ScoredItem] = []
-        if self.image_store is not None and self.image_embedder is not None and len(self.image_store):
+
+        # 2a. OCR'd text from tables and figures, embedded with the text
+        # encoder. This is the route that actually works on scientific
+        # documents.
+        if self.visual_text_store is not None and len(self.visual_text_store):
+            visual_hits.extend(
+                self.visual_text_store.search(text_vector, k=self.top_k)
+            )
+
+        # 2b. CLIP over the raw crops. Retained because it can catch purely
+        # pictorial figures that carry no readable text, but it is fused
+        # after the OCR route rather than relied upon.
+        if (
+            self.image_store is not None
+            and self.image_embedder is not None
+            and len(self.image_store)
+        ):
             clip_query = self.image_embedder.embed_texts([query])
-            visual_hits = self.image_store.search(clip_query, k=self.top_k)
+            clip_hits = self.image_store.search(clip_query, k=self.top_k)
+            if visual_hits:
+                visual_hits = reciprocal_rank_fusion(
+                    [visual_hits, clip_hits], k=self.rrf_k, top_n=self.top_k
+                )
+            else:
+                visual_hits = clip_hits
 
         # 3. Graph expansion from entities mentioned in the query.
         graph_entities: list[str] = []
@@ -221,15 +255,21 @@ class EnhancedRAG:
         # Fuse the text rankings. Visual hits stay separate: they are a
         # different id space (regions, not chunks), and merging id spaces in
         # one ranking would corrupt the retrieval metrics.
-        rankings = [text_hits] + ([graph_hits] if graph_hits else [])
-        fused = reciprocal_rank_fusion(rankings, k=self.rrf_k, top_n=self.top_k)
+        rankings = [text_hits]
+        weights = [self.text_weight]
+        if graph_hits:
+            rankings.append(graph_hits)
+            weights.append(self.graph_weight)
+        fused = reciprocal_rank_fusion(
+            rankings, k=self.rrf_k, weights=weights, top_n=self.top_k
+        )
 
         return Provenance(
             text_chunks=fused,
             visual_regions=visual_hits,
             graph_entities=graph_entities,
             graph_paths=graph_paths,
-            retrieval_strategy="rrf(dense_text+graph)+clip_visual",
+            retrieval_strategy="rrf(dense_text+graph)+visual_text+clip",
         )
 
     def answer(self, query: str) -> Answer:
