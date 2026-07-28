@@ -1,4 +1,6 @@
 """Retrieval: vector store, BM25, and RRF fusion properties."""
+import importlib.util
+
 import numpy as np
 import pytest
 
@@ -190,6 +192,16 @@ def test_dedupe_keeps_best_ranked_occurrence():
     assert _ids(out) == ["a", "b"] and out[0].score == 0.9
 
 
+# CLIP tests need torch, which is deliberately NOT in requirements-min.txt:
+# the package advertises that its logic layers run without the heavy ML stack,
+# and CI enforces that by installing only the minimal set. These tests are
+# skipped there rather than failing, and run in the full-dependency job.
+requires_torch = pytest.mark.skipif(
+    importlib.util.find_spec("torch") is None,
+    reason="torch not installed (optional dependency)",
+)
+
+
 # ---------- CLIP output-shape compatibility ----------
 
 class _FakeTensor:
@@ -214,12 +226,14 @@ def _clip_extract(result, model, projection):
     return CLIPEmbedder._as_embedding(result, model, projection)
 
 
+@requires_torch
 def test_clip_passes_through_a_plain_tensor(monkeypatch):
     import torch
     t = torch.zeros(2, 512)
     assert _clip_extract(t, object(), "visual_projection") is t
 
 
+@requires_torch
 def test_clip_unwraps_image_embeds(monkeypatch):
     import torch
     embeds = torch.zeros(2, 512)
@@ -227,6 +241,7 @@ def test_clip_unwraps_image_embeds(monkeypatch):
     assert out is embeds
 
 
+@requires_torch
 def test_clip_projects_raw_pooler_output():
     """768-dim pooler_output is pre-projection and must be projected."""
     import torch
@@ -240,6 +255,7 @@ def test_clip_projects_raw_pooler_output():
     assert out.shape == (2, 512)
 
 
+@requires_torch
 def test_clip_leaves_already_projected_output_alone():
     """512-dim pooler_output is ALREADY projected.
 
@@ -258,6 +274,7 @@ def test_clip_leaves_already_projected_output_alone():
     assert out is pooled, "already-projected features must pass through untouched"
 
 
+@requires_torch
 def test_clip_refuses_to_guess_on_unexpected_dimension():
     import torch
 
@@ -270,6 +287,7 @@ def test_clip_refuses_to_guess_on_unexpected_dimension():
                       _Model(), "visual_projection")
 
 
+@requires_torch
 def test_clip_falls_back_to_cls_token():
     import torch
 
@@ -286,11 +304,13 @@ def test_clip_falls_back_to_cls_token():
     assert out.shape == (2, 512)
 
 
+@requires_torch
 def test_clip_raises_on_unrecognised_output():
     with pytest.raises(RuntimeError, match="Could not extract embeddings"):
         _clip_extract(object(), object(), "visual_projection")
 
 
+@requires_torch
 def test_clip_embeddings_are_detached_from_autograd():
     """Regression: the projection ran outside no_grad, so the result carried
     gradient tracking and .numpy() refused to convert it.

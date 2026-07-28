@@ -79,6 +79,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-min.txt pillow==10.4.0 pytesseract==0.3.13
+          # CPU-only torch: the CLIP compatibility tests are pure tensor logic
+          # and need no GPU, but without torch installed anywhere they would
+          # be skipped in every job and the fix would have no CI coverage.
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Run the full suite with optional dependencies present
+        run: PYTHONPATH=src pytest tests/ -q
 
       - name: Regenerate fixtures from source
         run: python scripts/make_fixtures.py /tmp/fixtures
