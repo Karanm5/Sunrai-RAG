@@ -1,0 +1,1602 @@
+{
+  "baseline": [
+    {
+      "qa_id": "text_0000",
+      "question": "What approach can help identify weaknesses in a medical procedure that relies on human involvement?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5279992_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5279992_00007#r002",
+        "PMC5901827_00001#r000",
+        "PMC4947109_00001#r000",
+        "PMC5279992_00007#r007",
+        "PMC4368419_00006#r001"
+      ]
+    },
+    {
+      "qa_id": "text_0001",
+      "question": "Which nation has established a significant official limit on healthcare costs?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5998770_00004#r007"
+      ],
+      "retrieved_region_ids": [
+        "PMC5998770_00004#r006",
+        "PMC5998770_00004#r000",
+        "PMC5998770_00004#r007",
+        "PMC5998770_00004#r002",
+        "PMC5998770_00004#r004"
+      ]
+    },
+    {
+      "qa_id": "text_0002",
+      "question": "How do body measurements change when people sign up at different times of the year?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4537884_00002#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC3508414_00004#r002",
+        "PMC5410135_00002#r000",
+        "PMC4537884_00002#r001",
+        "PMC5714432_00005#r013",
+        "PMC3508414_00004#r009"
+      ]
+    },
+    {
+      "qa_id": "text_0003",
+      "question": "What happens to a certain protein that normally keeps NF-xB in check when stomach cells are infected with a particular bacterium?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5700561_00001#r009"
+      ],
+      "retrieved_region_ids": [
+        "PMC5700561_00001#r009",
+        "PMC5700561_00001#r010",
+        "PMC5700561_00001#r011",
+        "PMC3175400_00001#r002",
+        "PMC5700561_00001#r004"
+      ]
+    },
+    {
+      "qa_id": "text_0004",
+      "question": "What percentage of people asked to take part in the research actually agreed to do so?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5091630_00002#r004"
+      ],
+      "retrieved_region_ids": [
+        "PMC5091630_00002#r004",
+        "PMC3541255_00002#r013",
+        "PMC5833025_00010#r003",
+        "PMC5141463_00000#r007",
+        "PMC4947109_00001#r003"
+      ]
+    },
+    {
+      "qa_id": "text_0005",
+      "question": "What is missing from current knowledge about how diseases progress after a certain infection?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5700561_00001#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5700561_00001#r013",
+        "PMC5714432_00005#r008",
+        "PMC5767555_00000#r008",
+        "PMC5700561_00001#r004",
+        "PMC3347540_00000#r002"
+      ]
+    },
+    {
+      "qa_id": "text_0006",
+      "question": "Do species that are closely related always have the same eating habits?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4321144_00001#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC4321144_00001#r011",
+        "PMC4321144_00001#r004",
+        "PMC4321144_00001#r005",
+        "PMC4321144_00001#r010",
+        "PMC4321144_00001#r008"
+      ]
+    },
+    {
+      "qa_id": "text_0007",
+      "question": "How is the consistency of inherited characteristics across different conditions determined for each feature?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4552779_00002#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC4773046_00018#r001",
+        "PMC4419741_00007#r000",
+        "PMC4419741_00007#r003",
+        "PMC6020783_00008#r005",
+        "PMC4552779_00002#r005"
+      ]
+    },
+    {
+      "qa_id": "visual_0008",
+      "question": "What is the minimum value recorded in the dataset?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC4802086_00006#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC4973685_00005#r002",
+        "PMC4563774_00003#r005",
+        "PMC2808175_00008#r000",
+        "PMC5423988_00002#r004",
+        "PMC5436402_00001#r002"
+      ]
+    },
+    {
+      "qa_id": "visual_0009",
+      "question": "What is the median value for Variant A?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5838143_00005#r008"
+      ],
+      "retrieved_region_ids": [
+        "PMC5838143_00005#r000",
+        "PMC4537884_00002#r005",
+        "PMC6029399_00002#r005",
+        "PMC4563774_00003#r005",
+        "PMC5838143_00005#r004"
+      ]
+    },
+    {
+      "qa_id": "visual_0010",
+      "question": "Which nation has the highest threshold for special funding in pharmaceutical expenses?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5998770_00004#r009"
+      ],
+      "retrieved_region_ids": [
+        "PMC5998770_00004#r002",
+        "PMC5998770_00004#r000",
+        "PMC5998770_00004#r007",
+        "PMC5998770_00004#r003",
+        "PMC5998770_00004#r004"
+      ]
+    },
+    {
+      "qa_id": "visual_0011",
+      "question": "What is the value associated with the item labeled LM?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5591352_00002#r008"
+      ],
+      "retrieved_region_ids": [
+        "PMC4537884_00002#r005",
+        "PMC4973685_00005#r002",
+        "PMC4870735_00002#r013",
+        "PMC3671673_00004#r004",
+        "PMC5217331_00002#r009"
+      ]
+    },
+    {
+      "qa_id": "visual_0012",
+      "question": "What proportion of the total samples are from females?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC3120659_00004#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5714432_00005#r007",
+        "PMC4910563_00005#r000",
+        "PMC5543471_00003#r010",
+        "PMC4947109_00001#r003",
+        "PMC5091630_00002#r004"
+      ]
+    },
+    {
+      "qa_id": "visual_0013",
+      "question": "What is the threshold for ATP in a specific medical context?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC3537528_00006#r006"
+      ],
+      "retrieved_region_ids": [
+        "PMC5410135_00002#r006",
+        "PMC4910563_00005#r000",
+        "PMC5349212_00000#r002",
+        "PMC4606815_00002#r004",
+        "PMC5714432_00005#r010"
+      ]
+    },
+    {
+      "qa_id": "visual_0014",
+      "question": "What proportion of caregivers are fathers in Vietnam?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC4837485_00006#r006"
+      ],
+      "retrieved_region_ids": [
+        "PMC4837485_00006#r000",
+        "PMC4837485_00006#r002",
+        "PMC4837485_00006#r005",
+        "PMC4837485_00006#r004",
+        "PMC4837485_00006#r008"
+      ]
+    },
+    {
+      "qa_id": "visual_0015",
+      "question": "What is the value associated with the third item in the sequence of fuel additives?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5947618_00010#r003"
+      ],
+      "retrieved_region_ids": [
+        "PMC5217331_00002#r005",
+        "PMC5434938_00006#r000",
+        "PMC6084435_00008#r006",
+        "PMC5434938_00006#r001",
+        "PMC6104654_00002#r000"
+      ]
+    },
+    {
+      "qa_id": "multihop_0016",
+      "question": "What molecular pathway is implicated in a disorder that presents with similar physical anomalies to a condition characterized by excessive cellular growth and inadequate programmed cell death?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC2686686_00005#r000",
+        "PMC2686686_00005#r003"
+      ],
+      "retrieved_region_ids": [
+        "PMC4934136_00003#r003",
+        "PMC5349212_00000#r002",
+        "PMC2686686_00005#r000",
+        "PMC5349212_00000#r001",
+        "PMC5891424_00006#r003"
+      ]
+    },
+    {
+      "qa_id": "multihop_0017",
+      "question": "What is the difference in the average age of the participants who were shown pictures of people from a different generation, between the group that is in the early stages of adulthood and the group that is in the later stages of life?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5099143_00002#r001",
+        "PMC5099143_00002#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5099143_00002#r003",
+        "PMC5099143_00002#r002",
+        "PMC5099143_00002#r001",
+        "PMC5307816_00006#r001",
+        "PMC5099143_00002#r000"
+      ]
+    },
+    {
+      "qa_id": "multihop_0018",
+      "question": "How do variations in a certain chemical element's forms impact its distribution across different ocean regions, and what factors contribute to its accumulation in areas with limited oxygen availability?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5993222_00007#r001",
+        "PMC5993222_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5993222_00007#r002",
+        "PMC5993222_00007#r001",
+        "PMC5993222_00007#r003",
+        "PMC5715044_00010#r000",
+        "PMC5993222_00007#r000"
+      ]
+    },
+    {
+      "qa_id": "multihop_0019",
+      "question": "How does the performance of a particular water collection method compare to a traditional system in terms of various environmental effects, and what is the range of accuracy when using specific equations to predict these effects?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC6104840_00007#r003",
+        "PMC6104840_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC6104840_00007#r000",
+        "PMC6104840_00007#r002",
+        "PMC6104654_00002#r001",
+        "PMC6104840_00007#r003",
+        "PMC5423988_00002#r006"
+      ]
+    },
+    {
+      "qa_id": "multihop_0020",
+      "question": "How did the researchers modify the task to make it more demanding and prevent participants from relying on a straightforward decision-making process?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC4596151_00004#r005",
+        "PMC4596151_00004#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC5325181_00020#r003",
+        "PMC5325181_00020#r006",
+        "PMC5325181_00020#r004",
+        "PMC5099143_00002#r008",
+        "PMC5325181_00020#r002"
+      ]
+    },
+    {
+      "qa_id": "multihop_0021",
+      "question": "Under what conditions can researchers freely utilize and build upon existing investigations into the health impacts of a specific atmospheric pollutant?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC2429903_00000#r006",
+        "PMC2429903_00000#r000"
+      ],
+      "retrieved_region_ids": [
+        "PMC2429903_00000#r004",
+        "PMC2429903_00000#r001",
+        "PMC2429903_00000#r007",
+        "PMC2429903_00000#r009",
+        "PMC2429903_00000#r002"
+      ]
+    },
+    {
+      "qa_id": "multihop_0022",
+      "question": "How does the velocity of blood flow change as it moves through different sections of the arterial system, and what methods have been used in the past to measure this velocity in various patient groups?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC4609308_00003#r002",
+        "PMC4609308_00003#r004"
+      ],
+      "retrieved_region_ids": [
+        "PMC4609308_00003#r000",
+        "PMC4609308_00003#r002",
+        "PMC4609308_00003#r003",
+        "PMC4251397_00002#r003",
+        "PMC4609308_00003#r004"
+      ]
+    },
+    {
+      "qa_id": "multihop_0023",
+      "question": "How do researchers balance the trade-offs between modeling simplifications and accuracy when recreating historical ice coverage, and what specific thresholds do they use to determine acceptable discrepancies in their simulations?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5053285_00003#r000",
+        "PMC5053285_00003#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC5053285_00003#r001",
+        "PMC5053285_00003#r000",
+        "PMC5053285_00003#r002",
+        "PMC6104654_00002#r002",
+        "PMC5053285_00003#r003"
+      ]
+    }
+  ],
+  "enhanced": [
+    {
+      "qa_id": "text_0000",
+      "question": "What approach can help identify weaknesses in a medical procedure that relies on human involvement?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5279992_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5279992_00007#r002",
+        "PMC4895853_00003#r010",
+        "PMC5901827_00001#r000",
+        "PMC4461909_00008#r005",
+        "PMC4947109_00001#r000",
+        "PMC5423988_00002#r010",
+        "PMC5279992_00007#r007",
+        "PMC5591352_00002#r008",
+        "PMC4368419_00006#r001",
+        "PMC5579150_00007#r006"
+      ]
+    },
+    {
+      "qa_id": "text_0001",
+      "question": "Which nation has established a significant official limit on healthcare costs?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5998770_00004#r007"
+      ],
+      "retrieved_region_ids": [
+        "PMC5998770_00004#r006",
+        "PMC5998770_00004#r009",
+        "PMC5998770_00004#r000",
+        "PMC3671673_00004#r008",
+        "PMC5998770_00004#r007",
+        "PMC4837485_00006#r007",
+        "PMC5998770_00004#r002",
+        "PMC4461909_00008#r005",
+        "PMC5998770_00004#r004",
+        "PMC4837485_00006#r006"
+      ]
+    },
+    {
+      "qa_id": "text_0002",
+      "question": "How do body measurements change when people sign up at different times of the year?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4537884_00002#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC3508414_00004#r002",
+        "PMC5591352_00002#r008",
+        "PMC5410135_00002#r000",
+        "PMC4982026_00001#r006",
+        "PMC4537884_00002#r001",
+        "PMC5592712_00002#r015",
+        "PMC5714432_00005#r013",
+        "PMC5467671_00004#r009",
+        "PMC3508414_00004#r009",
+        "PMC3541255_00002#r017"
+      ]
+    },
+    {
+      "qa_id": "text_0003",
+      "question": "What happens to a certain protein that normally keeps NF-xB in check when stomach cells are infected with a particular bacterium?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5700561_00001#r009"
+      ],
+      "retrieved_region_ids": [
+        "PMC5700561_00001#r009",
+        "PMC4934136_00003#r007",
+        "PMC5700561_00001#r010",
+        "PMC5067641_00001#r008",
+        "PMC5700561_00001#r011",
+        "PMC5592712_00002#r015",
+        "PMC3175400_00001#r002",
+        "PMC5591352_00002#r008",
+        "PMC5700561_00001#r004",
+        "PMC4870735_00002#r012"
+      ]
+    },
+    {
+      "qa_id": "text_0004",
+      "question": "What percentage of people asked to take part in the research actually agreed to do so?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5091630_00002#r004"
+      ],
+      "retrieved_region_ids": [
+        "PMC5091630_00002#r004",
+        "PMC3614271_00002#r008",
+        "PMC3541255_00002#r013",
+        "PMC5591352_00002#r008",
+        "PMC5833025_00010#r003",
+        "PMC5998770_00004#r009",
+        "PMC5141463_00000#r007",
+        "PMC4461909_00008#r005",
+        "PMC4947109_00001#r003",
+        "PMC5579150_00007#r006"
+      ]
+    },
+    {
+      "qa_id": "text_0005",
+      "question": "What is missing from current knowledge about how diseases progress after a certain infection?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5700561_00001#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5700561_00001#r013",
+        "PMC4934136_00003#r007",
+        "PMC5714432_00005#r008",
+        "PMC5592712_00002#r015",
+        "PMC5767555_00000#r008",
+        "PMC4895853_00003#r010",
+        "PMC5700561_00001#r004",
+        "PMC3541255_00002#r017",
+        "PMC3347540_00000#r002",
+        "PMC4934136_00003#r008"
+      ]
+    },
+    {
+      "qa_id": "text_0006",
+      "question": "Do species that are closely related always have the same eating habits?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4321144_00001#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC4321144_00001#r011",
+        "PMC6084435_00008#r008",
+        "PMC4321144_00001#r004",
+        "PMC5592712_00002#r015",
+        "PMC4321144_00001#r005",
+        "PMC4837485_00006#r007",
+        "PMC4321144_00001#r010",
+        "PMC3541255_00002#r017",
+        "PMC4321144_00001#r008",
+        "PMC5715044_00010#r009"
+      ]
+    },
+    {
+      "qa_id": "text_0007",
+      "question": "How is the consistency of inherited characteristics across different conditions determined for each feature?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4552779_00002#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC4773046_00018#r001",
+        "PMC4837485_00006#r007",
+        "PMC4419741_00007#r000",
+        "PMC5591352_00002#r008",
+        "PMC4419741_00007#r003",
+        "PMC4837485_00006#r006",
+        "PMC6020783_00008#r005",
+        "PMC5067641_00001#r008",
+        "PMC4552779_00002#r005",
+        "PMC5467671_00004#r009"
+      ]
+    },
+    {
+      "qa_id": "visual_0008",
+      "question": "What is the minimum value recorded in the dataset?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC4802086_00006#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC4973685_00005#r002",
+        "PMC5591352_00002#r008",
+        "PMC4563774_00003#r005",
+        "PMC5423988_00002#r010",
+        "PMC2808175_00008#r000",
+        "PMC5838143_00005#r008",
+        "PMC5423988_00002#r004",
+        "PMC4461909_00008#r005",
+        "PMC5436402_00001#r002",
+        "PMC5357265_00004#r007"
+      ]
+    },
+    {
+      "qa_id": "visual_0009",
+      "question": "What is the median value for Variant A?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5838143_00005#r008"
+      ],
+      "retrieved_region_ids": [
+        "PMC5838143_00005#r000",
+        "PMC5838143_00005#r008",
+        "PMC4537884_00002#r005",
+        "PMC5591352_00002#r008",
+        "PMC6029399_00002#r005",
+        "PMC1599750_00010#r006",
+        "PMC4563774_00003#r005",
+        "PMC5067641_00001#r008",
+        "PMC5838143_00005#r004",
+        "PMC3390294_00003#r006"
+      ]
+    },
+    {
+      "qa_id": "visual_0010",
+      "question": "Which nation has the highest threshold for special funding in pharmaceutical expenses?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5998770_00004#r009"
+      ],
+      "retrieved_region_ids": [
+        "PMC5998770_00004#r002",
+        "PMC5998770_00004#r009",
+        "PMC5998770_00004#r000",
+        "PMC5591352_00002#r008",
+        "PMC5998770_00004#r007",
+        "PMC5579150_00007#r006",
+        "PMC5998770_00004#r003",
+        "PMC5067641_00001#r008",
+        "PMC5998770_00004#r004",
+        "PMC4837485_00006#r007"
+      ]
+    },
+    {
+      "qa_id": "visual_0011",
+      "question": "What is the value associated with the item labeled LM?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5591352_00002#r008"
+      ],
+      "retrieved_region_ids": [
+        "PMC4537884_00002#r005",
+        "PMC5591352_00002#r008",
+        "PMC4973685_00005#r002",
+        "PMC4461909_00008#r005",
+        "PMC4870735_00002#r013",
+        "PMC4125699_00003#r003",
+        "PMC3671673_00004#r004",
+        "PMC5067641_00001#r008",
+        "PMC5217331_00002#r009",
+        "PMC5431947_00005#r013"
+      ]
+    },
+    {
+      "qa_id": "visual_0012",
+      "question": "What proportion of the total samples are from females?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC3120659_00004#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5714432_00005#r007",
+        "PMC3120659_00004#r002",
+        "PMC4910563_00005#r000",
+        "PMC3942014_00004#r004",
+        "PMC5543471_00003#r010",
+        "PMC6035002_00013#r001",
+        "PMC4947109_00001#r003",
+        "PMC5591352_00002#r008",
+        "PMC5091630_00002#r004",
+        "PMC4969332_00002#r012"
+      ]
+    },
+    {
+      "qa_id": "visual_0013",
+      "question": "What is the threshold for ATP in a specific medical context?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC3537528_00006#r006"
+      ],
+      "retrieved_region_ids": [
+        "PMC5410135_00002#r006",
+        "PMC3537528_00006#r006",
+        "PMC4910563_00005#r000",
+        "PMC5591352_00002#r008",
+        "PMC5349212_00000#r002",
+        "PMC4125699_00003#r003",
+        "PMC4606815_00002#r004",
+        "PMC3671673_00004#r008",
+        "PMC5714432_00005#r010",
+        "PMC4934136_00003#r008"
+      ]
+    },
+    {
+      "qa_id": "visual_0014",
+      "question": "What proportion of caregivers are fathers in Vietnam?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC4837485_00006#r006"
+      ],
+      "retrieved_region_ids": [
+        "PMC4837485_00006#r000",
+        "PMC4837485_00006#r006",
+        "PMC4837485_00006#r002",
+        "PMC3671673_00004#r008",
+        "PMC4837485_00006#r005",
+        "PMC4837485_00006#r007",
+        "PMC4837485_00006#r004",
+        "PMC5592712_00002#r015",
+        "PMC4837485_00006#r008",
+        "PMC5423988_00002#r010"
+      ]
+    },
+    {
+      "qa_id": "visual_0015",
+      "question": "What is the value associated with the third item in the sequence of fuel additives?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5947618_00010#r003"
+      ],
+      "retrieved_region_ids": [
+        "PMC5217331_00002#r005",
+        "PMC5431947_00005#r013",
+        "PMC5434938_00006#r000",
+        "PMC2808175_00008#r009",
+        "PMC6084435_00008#r006",
+        "PMC4125699_00003#r003",
+        "PMC5434938_00006#r001",
+        "PMC5067641_00001#r008",
+        "PMC6104654_00002#r000",
+        "PMC3671673_00004#r005"
+      ]
+    },
+    {
+      "qa_id": "multihop_0016",
+      "question": "What molecular pathway is implicated in a disorder that presents with similar physical anomalies to a condition characterized by excessive cellular growth and inadequate programmed cell death?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC2686686_00005#r000",
+        "PMC2686686_00005#r003"
+      ],
+      "retrieved_region_ids": [
+        "PMC4934136_00003#r003",
+        "PMC5592712_00002#r015",
+        "PMC5349212_00000#r002",
+        "PMC4461909_00008#r005",
+        "PMC2686686_00005#r000",
+        "PMC4934136_00003#r007",
+        "PMC5349212_00000#r001",
+        "PMC2637833_00005#r008",
+        "PMC5891424_00006#r003",
+        "PMC5067641_00001#r008"
+      ]
+    },
+    {
+      "qa_id": "multihop_0017",
+      "question": "What is the difference in the average age of the participants who were shown pictures of people from a different generation, between the group that is in the early stages of adulthood and the group that is in the later stages of life?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5099143_00002#r001",
+        "PMC5099143_00002#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5099143_00002#r003",
+        "PMC4982026_00001#r006",
+        "PMC5099143_00002#r002",
+        "PMC5591352_00002#r008",
+        "PMC5099143_00002#r001",
+        "PMC4969332_00002#r012",
+        "PMC5307816_00006#r001",
+        "PMC5592712_00002#r015",
+        "PMC5099143_00002#r000",
+        "PMC4837485_00006#r007"
+      ]
+    },
+    {
+      "qa_id": "multihop_0018",
+      "question": "How do variations in a certain chemical element's forms impact its distribution across different ocean regions, and what factors contribute to its accumulation in areas with limited oxygen availability?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5993222_00007#r001",
+        "PMC5993222_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5993222_00007#r002",
+        "PMC5715044_00010#r010",
+        "PMC5993222_00007#r001",
+        "PMC2808175_00008#r009",
+        "PMC5993222_00007#r003",
+        "PMC3537528_00006#r006",
+        "PMC5715044_00010#r000",
+        "PMC5592712_00002#r015",
+        "PMC5993222_00007#r000",
+        "PMC5838143_00005#r008"
+      ]
+    },
+    {
+      "qa_id": "multihop_0019",
+      "question": "How does the performance of a particular water collection method compare to a traditional system in terms of various environmental effects, and what is the range of accuracy when using specific equations to predict these effects?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC6104840_00007#r003",
+        "PMC6104840_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC6104840_00007#r000",
+        "PMC5838143_00005#r008",
+        "PMC6104840_00007#r002",
+        "PMC4461909_00008#r005",
+        "PMC6104654_00002#r001",
+        "PMC5715044_00010#r010",
+        "PMC6104840_00007#r003",
+        "PMC5067641_00001#r008",
+        "PMC5423988_00002#r006",
+        "PMC5588948_00002#r001"
+      ]
+    },
+    {
+      "qa_id": "multihop_0020",
+      "question": "How did the researchers modify the task to make it more demanding and prevent participants from relying on a straightforward decision-making process?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC4596151_00004#r005",
+        "PMC4596151_00004#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC5325181_00020#r003",
+        "PMC5588948_00002#r001",
+        "PMC5325181_00020#r006",
+        "PMC4461909_00008#r005",
+        "PMC5325181_00020#r004",
+        "PMC5998770_00004#r009",
+        "PMC5099143_00002#r008",
+        "PMC5591352_00002#r008",
+        "PMC5325181_00020#r002",
+        "PMC3614271_00002#r008"
+      ]
+    },
+    {
+      "qa_id": "multihop_0021",
+      "question": "Under what conditions can researchers freely utilize and build upon existing investigations into the health impacts of a specific atmospheric pollutant?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC2429903_00000#r006",
+        "PMC2429903_00000#r000"
+      ],
+      "retrieved_region_ids": [
+        "PMC2429903_00000#r004",
+        "PMC6084435_00008#r008",
+        "PMC2429903_00000#r001",
+        "PMC4461909_00008#r005",
+        "PMC2429903_00000#r007",
+        "PMC4870735_00002#r012",
+        "PMC2429903_00000#r009",
+        "PMC5067641_00001#r008",
+        "PMC2429903_00000#r002",
+        "PMC5715044_00010#r010"
+      ]
+    },
+    {
+      "qa_id": "multihop_0022",
+      "question": "How does the velocity of blood flow change as it moves through different sections of the arterial system, and what methods have been used in the past to measure this velocity in various patient groups?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC4609308_00003#r002",
+        "PMC4609308_00003#r004"
+      ],
+      "retrieved_region_ids": [
+        "PMC4609308_00003#r000",
+        "PMC2654478_00006#r008",
+        "PMC4609308_00003#r002",
+        "PMC3541255_00002#r017",
+        "PMC4609308_00003#r003",
+        "PMC2637833_00005#r008",
+        "PMC4251397_00002#r003",
+        "PMC5591352_00002#r008",
+        "PMC4609308_00003#r004",
+        "PMC4895853_00003#r010"
+      ]
+    },
+    {
+      "qa_id": "multihop_0023",
+      "question": "How do researchers balance the trade-offs between modeling simplifications and accuracy when recreating historical ice coverage, and what specific thresholds do they use to determine acceptable discrepancies in their simulations?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5053285_00003#r000",
+        "PMC5053285_00003#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC5053285_00003#r001",
+        "PMC5838143_00005#r008",
+        "PMC5053285_00003#r000",
+        "PMC5067641_00001#r008",
+        "PMC5053285_00003#r002",
+        "PMC2808175_00008#r008",
+        "PMC6104654_00002#r002",
+        "PMC4461909_00008#r005",
+        "PMC5053285_00003#r003",
+        "PMC5715044_00010#r010"
+      ]
+    }
+  ],
+  "bm25_floor": [
+    {
+      "qa_id": "text_0000",
+      "question": "What approach can help identify weaknesses in a medical procedure that relies on human involvement?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5279992_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5716614_00001#r007",
+        "PMC5579150_00007#r000",
+        "PMC3541255_00002#r013",
+        "PMC4550639_00009#r004",
+        "PMC5526809_00002#r004"
+      ]
+    },
+    {
+      "qa_id": "text_0001",
+      "question": "Which nation has established a significant official limit on healthcare costs?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5998770_00004#r007"
+      ],
+      "retrieved_region_ids": [
+        "PMC5434938_00006#r001",
+        "PMC5537978_00005#r001",
+        "PMC5605591_00000#r007",
+        "PMC4639825_00002#r000",
+        "PMC5436402_00001#r005"
+      ]
+    },
+    {
+      "qa_id": "text_0002",
+      "question": "How do body measurements change when people sign up at different times of the year?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4537884_00002#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC5700561_00001#r013",
+        "PMC5431366_00001#r001",
+        "PMC5901827_00001#r004",
+        "PMC5698949_00007#r010",
+        "PMC4606815_00002#r014"
+      ]
+    },
+    {
+      "qa_id": "text_0003",
+      "question": "What happens to a certain protein that normally keeps NF-xB in check when stomach cells are infected with a particular bacterium?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5700561_00001#r009"
+      ],
+      "retrieved_region_ids": [
+        "PMC4517690_00005#r003",
+        "PMC5700561_00001#r010",
+        "PMC5700561_00001#r009",
+        "PMC5700561_00001#r000",
+        "PMC5700561_00001#r012"
+      ]
+    },
+    {
+      "qa_id": "text_0004",
+      "question": "What percentage of people asked to take part in the research actually agreed to do so?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5091630_00002#r004"
+      ],
+      "retrieved_region_ids": [
+        "PMC5698949_00007#r011",
+        "PMC5579150_00007#r001",
+        "PMC4606815_00002#r014",
+        "PMC5700561_00001#r013",
+        "PMC5838143_00005#r005"
+      ]
+    },
+    {
+      "qa_id": "text_0005",
+      "question": "What is missing from current knowledge about how diseases progress after a certain infection?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5700561_00001#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC3347540_00000#r002",
+        "PMC4368419_00006#r004",
+        "PMC5405047_00005#r010",
+        "PMC5537978_00005#r004",
+        "PMC5700561_00001#r010"
+      ]
+    },
+    {
+      "qa_id": "text_0006",
+      "question": "Do species that are closely related always have the same eating habits?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4321144_00001#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC4596151_00004#r000",
+        "PMC6084435_00008#r004",
+        "PMC5436402_00001#r001",
+        "PMC5325849_00000#r003",
+        "PMC4596151_00004#r008"
+      ]
+    },
+    {
+      "qa_id": "text_0007",
+      "question": "How is the consistency of inherited characteristics across different conditions determined for each feature?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4552779_00002#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC6020783_00008#r006",
+        "PMC6020783_00008#r001",
+        "PMC6020783_00008#r003",
+        "PMC4205895_00005#r004",
+        "PMC5998770_00004#r006"
+      ]
+    },
+    {
+      "qa_id": "visual_0008",
+      "question": "What is the minimum value recorded in the dataset?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC4802086_00006#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC4563774_00003#r005",
+        "PMC5954707_00001#r003",
+        "PMC4729578_00000#r000",
+        "PMC5423988_00002#r004",
+        "PMC4251397_00002#r003"
+      ]
+    },
+    {
+      "qa_id": "visual_0009",
+      "question": "What is the median value for Variant A?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5838143_00005#r008"
+      ],
+      "retrieved_region_ids": [
+        "PMC4934136_00003#r001",
+        "PMC5325849_00000#r002",
+        "PMC5579150_00007#r001",
+        "PMC5397518_00006#r006",
+        "PMC5217331_00002#r007"
+      ]
+    },
+    {
+      "qa_id": "visual_0010",
+      "question": "Which nation has the highest threshold for special funding in pharmaceutical expenses?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5998770_00004#r009"
+      ],
+      "retrieved_region_ids": [
+        "PMC5605591_00000#r007",
+        "PMC5998770_00004#r002",
+        "PMC4639825_00002#r000",
+        "PMC5725523_00004#r006",
+        "PMC4537884_00002#r001"
+      ]
+    },
+    {
+      "qa_id": "visual_0011",
+      "question": "What is the value associated with the item labeled LM?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5591352_00002#r008"
+      ],
+      "retrieved_region_ids": [
+        "PMC5579150_00007#r001",
+        "PMC5658909_00001#r003",
+        "PMC5658909_00001#r002",
+        "PMC3384233_00000#r005",
+        "PMC3664636_00001#r002"
+      ]
+    },
+    {
+      "qa_id": "visual_0012",
+      "question": "What proportion of the total samples are from females?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC3120659_00004#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5709985_00001#r007",
+        "PMC3508414_00004#r001",
+        "PMC3508414_00004#r000",
+        "PMC5429906_00004#r000",
+        "PMC4982026_00001#r001"
+      ]
+    },
+    {
+      "qa_id": "visual_0013",
+      "question": "What is the threshold for ATP in a specific medical context?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC3537528_00006#r006"
+      ],
+      "retrieved_region_ids": [
+        "PMC5998770_00004#r002",
+        "PMC3741930_00000#r000",
+        "PMC2865005_00003#r005",
+        "PMC5579150_00007#r003",
+        "PMC5928379_00005#r001"
+      ]
+    },
+    {
+      "qa_id": "visual_0014",
+      "question": "What proportion of caregivers are fathers in Vietnam?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC4837485_00006#r006"
+      ],
+      "retrieved_region_ids": [
+        "PMC4837485_00006#r000",
+        "PMC5320005_00000#r002",
+        "PMC5526809_00002#r002",
+        "PMC5579150_00007#r001",
+        "PMC5716614_00001#r007"
+      ]
+    },
+    {
+      "qa_id": "visual_0015",
+      "question": "What is the value associated with the third item in the sequence of fuel additives?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5947618_00010#r003"
+      ],
+      "retrieved_region_ids": [
+        "PMC5579150_00007#r001",
+        "PMC5658909_00001#r003",
+        "PMC4794635_00008#r005",
+        "PMC5658909_00001#r002",
+        "PMC5838143_00005#r005"
+      ]
+    },
+    {
+      "qa_id": "multihop_0016",
+      "question": "What molecular pathway is implicated in a disorder that presents with similar physical anomalies to a condition characterized by excessive cellular growth and inadequate programmed cell death?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC2686686_00005#r000",
+        "PMC2686686_00005#r003"
+      ],
+      "retrieved_region_ids": [
+        "PMC5700561_00001#r015",
+        "PMC4650740_00006#r001",
+        "PMC5405047_00005#r004",
+        "PMC3384233_00000#r005",
+        "PMC2686686_00005#r004"
+      ]
+    },
+    {
+      "qa_id": "multihop_0017",
+      "question": "What is the difference in the average age of the participants who were shown pictures of people from a different generation, between the group that is in the early stages of adulthood and the group that is in the later stages of life?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5099143_00002#r001",
+        "PMC5099143_00002#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5482710_00003#r005",
+        "PMC5307816_00006#r010",
+        "PMC4219614_00001#r009",
+        "PMC5998770_00004#r001",
+        "PMC5706999_00003#r004"
+      ]
+    },
+    {
+      "qa_id": "multihop_0018",
+      "question": "How do variations in a certain chemical element's forms impact its distribution across different ocean regions, and what factors contribute to its accumulation in areas with limited oxygen availability?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5993222_00007#r001",
+        "PMC5993222_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5993222_00007#r002",
+        "PMC5993222_00007#r001",
+        "PMC3240514_00000#r005",
+        "PMC3384233_00000#r005",
+        "PMC5993222_00007#r003"
+      ]
+    },
+    {
+      "qa_id": "multihop_0019",
+      "question": "How does the performance of a particular water collection method compare to a traditional system in terms of various environmental effects, and what is the range of accuracy when using specific equations to predict these effects?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC6104840_00007#r003",
+        "PMC6104840_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5998770_00004#r000",
+        "PMC3992233_00001#r000",
+        "PMC4743617_00001#r004",
+        "PMC3986515_00006#r008",
+        "PMC5709985_00001#r001"
+      ]
+    },
+    {
+      "qa_id": "multihop_0020",
+      "question": "How did the researchers modify the task to make it more demanding and prevent participants from relying on a straightforward decision-making process?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC4596151_00004#r005",
+        "PMC4596151_00004#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC5698949_00007#r012",
+        "PMC1599750_00010#r005",
+        "PMC4596151_00004#r002",
+        "PMC4180984_00001#r000",
+        "PMC5279992_00007#r005"
+      ]
+    },
+    {
+      "qa_id": "multihop_0021",
+      "question": "Under what conditions can researchers freely utilize and build upon existing investigations into the health impacts of a specific atmospheric pollutant?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC2429903_00000#r006",
+        "PMC2429903_00000#r000"
+      ],
+      "retrieved_region_ids": [
+        "PMC5700561_00001#r009",
+        "PMC3175400_00001#r005",
+        "PMC5716614_00001#r007",
+        "PMC5592712_00002#r005",
+        "PMC5828319_00000#r003"
+      ]
+    },
+    {
+      "qa_id": "multihop_0022",
+      "question": "How does the velocity of blood flow change as it moves through different sections of the arterial system, and what methods have been used in the past to measure this velocity in various patient groups?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC4609308_00003#r002",
+        "PMC4609308_00003#r004"
+      ],
+      "retrieved_region_ids": [
+        "PMC3080337_00000#r001",
+        "PMC4251397_00002#r003",
+        "PMC4251397_00002#r001",
+        "PMC5698949_00007#r010",
+        "PMC3196246_00000#r001"
+      ]
+    },
+    {
+      "qa_id": "multihop_0023",
+      "question": "How do researchers balance the trade-offs between modeling simplifications and accuracy when recreating historical ice coverage, and what specific thresholds do they use to determine acceptable discrepancies in their simulations?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5053285_00003#r000",
+        "PMC5053285_00003#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC5053285_00003#r001",
+        "PMC4947109_00001#r009",
+        "PMC5700561_00001#r013",
+        "PMC5431366_00001#r001",
+        "PMC5716614_00001#r003"
+      ]
+    }
+  ],
+  "random_floor": [
+    {
+      "qa_id": "text_0000",
+      "question": "What approach can help identify weaknesses in a medical procedure that relies on human involvement?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5279992_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC3741930_00000#r001",
+        "PMC5699441_00027#r002",
+        "PMC5228585_00006#r003",
+        "PMC5402033_00010#r005",
+        "PMC5349212_00000#r006"
+      ]
+    },
+    {
+      "qa_id": "text_0001",
+      "question": "Which nation has established a significant official limit on healthcare costs?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5998770_00004#r007"
+      ],
+      "retrieved_region_ids": [
+        "PMC3196246_00000#r009",
+        "PMC6029399_00002#r003",
+        "PMC3175400_00001#r004",
+        "PMC4282038_00000#r007",
+        "PMC3388424_00000#r006"
+      ]
+    },
+    {
+      "qa_id": "text_0002",
+      "question": "How do body measurements change when people sign up at different times of the year?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4537884_00002#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC5999418_00004#r002",
+        "PMC5709985_00001#r001",
+        "PMC4870735_00002#r005",
+        "PMC5891424_00006#r007",
+        "PMC5575505_00000#r002"
+      ]
+    },
+    {
+      "qa_id": "text_0003",
+      "question": "What happens to a certain protein that normally keeps NF-xB in check when stomach cells are infected with a particular bacterium?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5700561_00001#r009"
+      ],
+      "retrieved_region_ids": [
+        "PMC4282038_00000#r007",
+        "PMC5700561_00001#r006",
+        "PMC5745221_00001#r004",
+        "PMC4321144_00001#r001",
+        "PMC5715044_00010#r005"
+      ]
+    },
+    {
+      "qa_id": "text_0004",
+      "question": "What percentage of people asked to take part in the research actually agreed to do so?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5091630_00002#r004"
+      ],
+      "retrieved_region_ids": [
+        "PMC4533242_00001#r001",
+        "PMC5828319_00000#r009",
+        "PMC5714432_00005#r003",
+        "PMC5099143_00002#r008",
+        "PMC3080337_00000#r007"
+      ]
+    },
+    {
+      "qa_id": "text_0005",
+      "question": "What is missing from current knowledge about how diseases progress after a certain infection?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC5700561_00001#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC4438100_00007#r001",
+        "PMC5537978_00005#r003",
+        "PMC4219614_00001#r007",
+        "PMC5293402_00000#r000",
+        "PMC4219614_00001#r002"
+      ]
+    },
+    {
+      "qa_id": "text_0006",
+      "question": "Do species that are closely related always have the same eating habits?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4321144_00001#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC3120659_00004#r000",
+        "PMC5901827_00001#r000",
+        "PMC5512827_00007#r004",
+        "PMC5141463_00000#r002",
+        "PMC2925387_00002#r002"
+      ]
+    },
+    {
+      "qa_id": "text_0007",
+      "question": "How is the consistency of inherited characteristics across different conditions determined for each feature?",
+      "query_type": "text_answerable",
+      "gold_region_ids": [
+        "PMC4552779_00002#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC5307816_00006#r008",
+        "PMC3492915_00000#r002",
+        "PMC5349212_00000#r000",
+        "PMC6020783_00008#r009",
+        "PMC2429903_00000#r001"
+      ]
+    },
+    {
+      "qa_id": "visual_0008",
+      "question": "What is the minimum value recorded in the dataset?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC4802086_00006#r005"
+      ],
+      "retrieved_region_ids": [
+        "PMC4228701_00000#r001",
+        "PMC2865005_00003#r003",
+        "PMC3671673_00004#r001",
+        "PMC5429906_00004#r001",
+        "PMC3211193_00002#r004"
+      ]
+    },
+    {
+      "qa_id": "visual_0009",
+      "question": "What is the median value for Variant A?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5838143_00005#r008"
+      ],
+      "retrieved_region_ids": [
+        "PMC2654478_00006#r000",
+        "PMC5575505_00000#r001",
+        "PMC5767555_00000#r006",
+        "PMC4794635_00008#r002",
+        "PMC5357265_00004#r001"
+      ]
+    },
+    {
+      "qa_id": "visual_0010",
+      "question": "Which nation has the highest threshold for special funding in pharmaceutical expenses?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5998770_00004#r009"
+      ],
+      "retrieved_region_ids": [
+        "PMC5293402_00000#r002",
+        "PMC5349212_00000#r004",
+        "PMC4969332_00002#r008",
+        "PMC5700561_00001#r009",
+        "PMC4729578_00000#r013"
+      ]
+    },
+    {
+      "qa_id": "visual_0011",
+      "question": "What is the value associated with the item labeled LM?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5591352_00002#r008"
+      ],
+      "retrieved_region_ids": [
+        "PMC5698949_00007#r000",
+        "PMC5498817_00003#r009",
+        "PMC2962807_00004#r002",
+        "PMC5599977_00004#r005",
+        "PMC5700561_00001#r012"
+      ]
+    },
+    {
+      "qa_id": "visual_0012",
+      "question": "What proportion of the total samples are from females?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC3120659_00004#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC5901827_00001#r004",
+        "PMC4802086_00006#r004",
+        "PMC5429906_00004#r004",
+        "PMC4374651_00008#r001",
+        "PMC5436402_00001#r007"
+      ]
+    },
+    {
+      "qa_id": "visual_0013",
+      "question": "What is the threshold for ATP in a specific medical context?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC3537528_00006#r006"
+      ],
+      "retrieved_region_ids": [
+        "PMC5228585_00006#r001",
+        "PMC4729578_00000#r011",
+        "PMC5992339_00012#r000",
+        "PMC5326487_00000#r000",
+        "PMC4569605_00005#r000"
+      ]
+    },
+    {
+      "qa_id": "visual_0014",
+      "question": "What proportion of caregivers are fathers in Vietnam?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC4837485_00006#r006"
+      ],
+      "retrieved_region_ids": [
+        "PMC5091630_00002#r005",
+        "PMC5279992_00007#r001",
+        "PMC4986346_00013#r001",
+        "PMC3211193_00002#r001",
+        "PMC5436402_00001#r006"
+      ]
+    },
+    {
+      "qa_id": "visual_0015",
+      "question": "What is the value associated with the third item in the sequence of fuel additives?",
+      "query_type": "visual_requiring",
+      "gold_region_ids": [
+        "PMC5947618_00010#r003"
+      ],
+      "retrieved_region_ids": [
+        "PMC5999161_00002#r002",
+        "PMC5715044_00010#r001",
+        "PMC4768816_00007#r005",
+        "PMC5217331_00002#r007",
+        "PMC5349212_00000#r005"
+      ]
+    },
+    {
+      "qa_id": "multihop_0016",
+      "question": "What molecular pathway is implicated in a disorder that presents with similar physical anomalies to a condition characterized by excessive cellular growth and inadequate programmed cell death?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC2686686_00005#r000",
+        "PMC2686686_00005#r003"
+      ],
+      "retrieved_region_ids": [
+        "PMC4910563_00005#r000",
+        "PMC5591352_00002#r003",
+        "PMC5800805_00000#r004",
+        "PMC5698949_00007#r006",
+        "PMC5434938_00006#r005"
+      ]
+    },
+    {
+      "qa_id": "multihop_0017",
+      "question": "What is the difference in the average age of the participants who were shown pictures of people from a different generation, between the group that is in the early stages of adulthood and the group that is in the later stages of life?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5099143_00002#r001",
+        "PMC5099143_00002#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC3107421_00000#r004",
+        "PMC2962807_00004#r000",
+        "PMC5293402_00000#r004",
+        "PMC4461909_00008#r000",
+        "PMC4438100_00007#r003"
+      ]
+    },
+    {
+      "qa_id": "multihop_0018",
+      "question": "How do variations in a certain chemical element's forms impact its distribution across different ocean regions, and what factors contribute to its accumulation in areas with limited oxygen availability?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5993222_00007#r001",
+        "PMC5993222_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC3649202_00011#r005",
+        "PMC3541255_00002#r004",
+        "PMC5543471_00003#r005",
+        "PMC5467671_00004#r001",
+        "PMC6047742_00002#r002"
+      ]
+    },
+    {
+      "qa_id": "multihop_0019",
+      "question": "How does the performance of a particular water collection method compare to a traditional system in terms of various environmental effects, and what is the range of accuracy when using specific equations to predict these effects?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC6104840_00007#r003",
+        "PMC6104840_00007#r002"
+      ],
+      "retrieved_region_ids": [
+        "PMC4947109_00001#r007",
+        "PMC4729578_00000#r014",
+        "PMC4991227_00003#r001",
+        "PMC5998770_00004#r008",
+        "PMC3986515_00006#r000"
+      ]
+    },
+    {
+      "qa_id": "multihop_0020",
+      "question": "How did the researchers modify the task to make it more demanding and prevent participants from relying on a straightforward decision-making process?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC4596151_00004#r005",
+        "PMC4596151_00004#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC3986515_00006#r003",
+        "PMC5870676_00001#r009",
+        "PMC4639825_00002#r002",
+        "PMC5357265_00004#r001",
+        "PMC5543471_00003#r001"
+      ]
+    },
+    {
+      "qa_id": "multihop_0021",
+      "question": "Under what conditions can researchers freely utilize and build upon existing investigations into the health impacts of a specific atmospheric pollutant?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC2429903_00000#r006",
+        "PMC2429903_00000#r000"
+      ],
+      "retrieved_region_ids": [
+        "PMC3541255_00002#r006",
+        "PMC5537978_00005#r006",
+        "PMC4612375_00003#r001",
+        "PMC5733955_00001#r009",
+        "PMC6084435_00008#r004"
+      ]
+    },
+    {
+      "qa_id": "multihop_0022",
+      "question": "How does the velocity of blood flow change as it moves through different sections of the arterial system, and what methods have been used in the past to measure this velocity in various patient groups?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC4609308_00003#r002",
+        "PMC4609308_00003#r004"
+      ],
+      "retrieved_region_ids": [
+        "PMC4550639_00009#r001",
+        "PMC4982026_00001#r002",
+        "PMC5698949_00007#r000",
+        "PMC3492915_00000#r001",
+        "PMC4676294_00007#r004"
+      ]
+    },
+    {
+      "qa_id": "multihop_0023",
+      "question": "How do researchers balance the trade-offs between modeling simplifications and accuracy when recreating historical ice coverage, and what specific thresholds do they use to determine acceptable discrepancies in their simulations?",
+      "query_type": "multi_hop",
+      "gold_region_ids": [
+        "PMC5053285_00003#r000",
+        "PMC5053285_00003#r001"
+      ],
+      "retrieved_region_ids": [
+        "PMC5811890_00008#r002",
+        "PMC5543471_00003#r009",
+        "PMC3492915_00000#r008",
+        "PMC4368419_00006#r002",
+        "PMC4609308_00003#r000"
+      ]
+    }
+  ]
+}
