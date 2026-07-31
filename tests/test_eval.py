@@ -379,3 +379,74 @@ def test_results_record_whether_generation_was_evaluated():
     payload = run_comparison({"baseline": _FakeSystem("b", ["r1"])},
                              qa, {}, {"r1"}, cfg, allow_stub=True)
     assert payload["generation_evaluated"] is True
+
+
+# ---------- independent verification without models ----------
+
+def test_retrieval_log_reproduces_the_headline_numbers(tmp_path):
+    """A reviewer must be able to confirm the results without reproducing
+    a 45-minute pipeline: no models, no API key, no network."""
+    from sunrai_rag.eval.run_eval import (
+        verify_from_log,
+        write_retrieval_log,
+    )
+
+    cfg = Config()
+    cfg.llm.backend = "groq"
+    cfg.eval.k_values = [1, 5]
+    cfg.eval.primary_k = 5
+    cfg.eval.generate_answers = False
+    cfg.eval.judge_enabled = False
+
+    qa = [QAItem("v1", "figure question?", QueryType.VISUAL_REQUIRING, ["rFIG"]),
+          QAItem("t1", "text question?", QueryType.TEXT_ANSWERABLE, ["rTXT"])]
+    payload = run_comparison(
+        {"baseline": _FakeSystem("baseline", ["rTXT"]),
+         "enhanced": _FakeSystem("enhanced", ["rFIG"])},
+        qa, {}, set(), cfg)
+    results = payload.pop("_results")
+    write_retrieval_log(results, tmp_path)
+
+    text = verify_from_log(tmp_path / "retrieval_log.json", [1, 5], 5)
+    assert "VERIFYING" in text
+    assert "baseline" in text and "enhanced" in text
+    assert "visual_requiring" in text
+
+
+def test_retrieval_log_records_gold_and_retrieved(tmp_path):
+    import json
+
+    from sunrai_rag.eval.run_eval import write_retrieval_log
+
+    cfg = Config()
+    cfg.llm.backend = "groq"
+    cfg.eval.k_values = [1]
+    cfg.eval.primary_k = 1
+    cfg.eval.generate_answers = False
+    cfg.eval.judge_enabled = False
+
+    qa = [QAItem("q1", "a question?", QueryType.VISUAL_REQUIRING, ["rGOLD"])]
+    payload = run_comparison({"enhanced": _FakeSystem("enhanced", ["rGOLD"])},
+                             qa, {}, set(), cfg)
+    write_retrieval_log(payload.pop("_results"), tmp_path)
+
+    log = json.loads((tmp_path / "retrieval_log.json").read_text())
+    record = log["enhanced"][0]
+    assert record["gold_region_ids"] == ["rGOLD"]
+    assert record["retrieved_region_ids"] == ["rGOLD"]
+    assert record["query_type"] == "visual_requiring"
+
+
+def test_results_json_excludes_internal_keys(tmp_path):
+    import json
+
+    cfg = Config()
+    cfg.llm.backend = "stub"
+    cfg.eval.k_values = [1]
+    cfg.eval.primary_k = 1
+    qa = [QAItem("q1", "a?", QueryType.TEXT_ANSWERABLE, ["r1"])]
+    payload = run_comparison({"baseline": _FakeSystem("b", ["r1"])},
+                             qa, {}, {"r1"}, cfg, allow_stub=True)
+    write_results(payload, tmp_path, primary_k=1)
+    saved = json.loads((tmp_path / "results.json").read_text())
+    assert not any(k.startswith("_") for k in saved)

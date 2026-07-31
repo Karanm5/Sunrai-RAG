@@ -20,6 +20,24 @@ gap is attributable to the components under test.
 
 ---
 
+## Checking the results without running anything
+
+Reproducing the full pipeline needs tesseract, ~2 GB of models, an API key and
+about 45 minutes. To confirm the reported numbers instead:
+
+```bash
+pip install -r requirements-min.txt   # no models, no API key, no network
+sunrai-rag verify --config configs/default.yaml
+```
+
+This recomputes every headline metric from `results/retrieval_log.json`, which
+records exactly what each system retrieved for each evaluation question. It
+takes seconds and runs anywhere.
+
+```bash
+pytest tests/ -q                      # ~250 tests, offline, ~1 second
+```
+
 ## Quick start
 
 ```bash

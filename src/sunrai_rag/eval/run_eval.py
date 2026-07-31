@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 import logging
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -53,6 +53,33 @@ class StubResultsError(RuntimeError):
 
 
 @dataclass
+class RetrievalRecord:
+    """What one system retrieved for one question.
+
+    Persisted so the headline metrics can be recomputed later with nothing
+    installed beyond the standard library -- no models, no API key, no
+    network. A reviewer can confirm the numbers in seconds instead of
+    reproducing a 45-minute pipeline, which is the difference between
+    "reproducible in principle" and "actually checked".
+    """
+
+    qa_id: str
+    question: str
+    query_type: str
+    gold_region_ids: list[str]
+    retrieved_region_ids: list[str]
+
+    def to_dict(self) -> dict:
+        return {
+            "qa_id": self.qa_id,
+            "question": self.question,
+            "query_type": self.query_type,
+            "gold_region_ids": list(self.gold_region_ids),
+            "retrieved_region_ids": list(self.retrieved_region_ids),
+        }
+
+
+@dataclass
 class SystemResult:
     """One system's scores, overall and per query segment."""
 
@@ -63,6 +90,7 @@ class SystemResult:
     mean_latency_s: float
     citation_validity: float
     support_rate: float
+    records: list[RetrievalRecord] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
@@ -119,6 +147,7 @@ def evaluate_system(
     retrieved_all: list[list[str]] = []
     gold_all: list[list[str]] = []
     per_segment: dict[str, tuple[list[list[str]], list[list[str]]]] = {}
+    records: list[RetrievalRecord] = []
     latencies: list[float] = []
     citation_scores: list[float] = []
     support_flags: list[bool] = []
@@ -145,6 +174,12 @@ def evaluate_system(
 
         retrieved = _to_region_ids(_provenance_ids(provenance), chunk_to_regions)
         retrieved_all.append(retrieved)
+        records.append(RetrievalRecord(
+            qa_id=item.qa_id, question=item.question,
+            query_type=item.query_type.value,
+            gold_region_ids=list(item.gold_region_ids),
+            retrieved_region_ids=list(retrieved),
+        ))
         gold_all.append(item.gold_region_ids)
 
         segment = item.query_type.value
@@ -189,6 +224,7 @@ def evaluate_system(
         support_rate=(
             sum(support_flags) / len(support_flags) if support_flags else 0.0
         ),
+        records=records,
     )
 
 
@@ -289,6 +325,9 @@ def run_comparison(
         "n_questions": len(qa_items),
         "generation_evaluated": cfg.eval.generate_answers,
         "systems": {label: result.to_dict() for label, result in results.items()},
+        # Popped by the CLI before serialisation; carries the per-question
+        # retrieval records used to build the verification log.
+        "_results": results,
     }
 
     if "baseline" in results and "enhanced" in results:
@@ -298,13 +337,72 @@ def run_comparison(
     return payload
 
 
+def write_retrieval_log(
+    results: dict[str, SystemResult], results_dir: str | Path
+) -> Path:
+    """Persist what every system retrieved for every question.
+
+    This is the artefact that makes the results independently checkable: the
+    metrics can be recomputed from it with no models, no API key and no
+    network, so a reviewer can confirm the headline numbers in seconds.
+    """
+    results_dir = Path(results_dir)
+    results_dir.mkdir(parents=True, exist_ok=True)
+    payload = {
+        label: [r.to_dict() for r in result.records]
+        for label, result in results.items()
+    }
+    path = results_dir / "retrieval_log.json"
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return path
+
+
+def verify_from_log(log_path: str | Path, k_values: Sequence[int], primary_k: int) -> str:
+    """Recompute the headline metrics from a saved retrieval log.
+
+    Depends on nothing beyond the standard library and this package's own
+    metric code, so it runs anywhere.
+    """
+    payload = json.loads(Path(log_path).read_text(encoding="utf-8"))
+    lines = [
+        "",
+        "=" * 66,
+        f"VERIFYING {log_path}",
+        "=" * 66,
+        f"{'system':<26}{'segment':<20}{'R@' + str(primary_k):>9}{'MRR':>9}",
+        "-" * 66,
+    ]
+    for label, records in payload.items():
+        by_segment: dict[str, list] = {"overall": []}
+        for record in records:
+            by_segment["overall"].append(record)
+            by_segment.setdefault(record["query_type"], []).append(record)
+        for segment, items in [("overall", by_segment["overall"])] + sorted(
+            (s, v) for s, v in by_segment.items() if s != "overall"
+        ):
+            scores = evaluate_retrieval(
+                [i["retrieved_region_ids"] for i in items],
+                [i["gold_region_ids"] for i in items],
+                k_values,
+            )
+            lines.append(
+                f"{label:<26}{segment:<20}"
+                f"{scores.recall.get(primary_k, 0.0):>9.4f}{scores.mrr:>9.4f}"
+            )
+    lines.append("=" * 66)
+    lines.append("Recomputed from the saved retrieval log -- no models, no API key.")
+    lines.append("=" * 66)
+    return "\n".join(lines)
+
+
 def write_results(payload: dict[str, Any], results_dir: str | Path, primary_k: int) -> Path:
     """Write results.json plus a flat comparison.csv for the report."""
     results_dir = Path(results_dir)
     results_dir.mkdir(parents=True, exist_ok=True)
 
+    serialisable = {k: v for k, v in payload.items() if not k.startswith("_")}
     (results_dir / "results.json").write_text(
-        json.dumps(payload, indent=2), encoding="utf-8"
+        json.dumps(serialisable, indent=2), encoding="utf-8"
     )
 
     rows: list[str] = [

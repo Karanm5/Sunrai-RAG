@@ -23,7 +23,13 @@ from pathlib import Path
 
 from .config import load_config, set_global_seeds
 from .eval.build_qa import build_qa_set, load_qa_set, qa_set_stats, save_qa_set
-from .eval.run_eval import format_summary, run_comparison, write_results
+from .eval.run_eval import (
+    format_summary,
+    run_comparison,
+    verify_from_log,
+    write_results,
+    write_retrieval_log,
+)
 from .index.bm25 import BM25Index
 from .index.vector_store import VectorStore
 from .ingest.loader import Corpus, ingest
@@ -232,8 +238,18 @@ def cmd_evaluate(cfg) -> None:
         judge_llm=llm if cfg.eval.judge_enabled else None,
     )
     csv_path = write_results(payload, cfg.paths.results_dir, cfg.eval.primary_k)
+    log_path = write_retrieval_log(payload.pop("_results"), cfg.paths.results_dir)
     print(format_summary(payload, cfg.eval.primary_k))
     log.info("Wrote %s", csv_path)
+    log.info("Wrote %s (recheck with: sunrai-rag verify)", log_path)
+
+
+def cmd_verify(cfg) -> None:
+    """Recompute the headline metrics from the saved retrieval log."""
+    path = Path(cfg.paths.results_dir) / "retrieval_log.json"
+    if not path.exists():
+        sys.exit(f"{path} not found. Run `sunrai-rag evaluate` first.")
+    print(verify_from_log(path, cfg.eval.k_values, cfg.eval.primary_k))
 
 
 def cmd_ask(cfg, question: str, system_name: str) -> None:
@@ -381,7 +397,8 @@ def _check_groq_model(cfg, ok: str, fail: str) -> None:
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="sunrai_rag", description=__doc__)
     parser.add_argument("stage", choices=[
-        "doctor", "ingest", "index", "kg", "build-qa", "evaluate", "ask", "all",
+        "doctor", "ingest", "index", "kg", "build-qa", "evaluate", "verify",
+        "ask", "all",
     ])
     parser.add_argument("--config", default="configs/default.yaml")
     parser.add_argument("-q", "--question", default=None)
@@ -407,6 +424,8 @@ def main(argv: list[str] | None = None) -> None:
         cmd_build_qa(cfg)
     elif args.stage == "evaluate":
         cmd_evaluate(cfg)
+    elif args.stage == "verify":
+        cmd_verify(cfg)
     elif args.stage == "ask":
         if not args.question:
             sys.exit("ask requires -q/--question")

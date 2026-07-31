@@ -57,6 +57,15 @@ def load_systems(config_path: str):
         image_store = VectorStore.load(art / "image_index")
         image_embedder = build_image_embedder(cfg)
 
+    # The OCR-text index over visual regions is the route that actually
+    # works on scientific documents; omitting it here would demo the
+    # CLIP-only path, which retrieves at chance on this content.
+    visual_text_store = (
+        VectorStore.load(art / "visual_text_index")
+        if (art / "visual_text_index").exists()
+        else None
+    )
+
     kg = KnowledgeGraph.load(art / "kg.json") if (art / "kg.json").exists() else None
 
     baseline = BaselineRAG(
@@ -66,10 +75,13 @@ def load_systems(config_path: str):
     enhanced = EnhancedRAG(
         chunks=corpus.chunks, regions=corpus.regions, text_store=text_store,
         text_embedder=text_embedder, llm=llm, image_store=image_store,
-        image_embedder=image_embedder, kg=kg, top_k=cfg.retrieval.top_k,
+        image_embedder=image_embedder, visual_text_store=visual_text_store,
+        kg=kg, top_k=cfg.retrieval.top_k,
         candidate_k=cfg.retrieval.candidate_k, rrf_k=cfg.retrieval.rrf_k,
         graph_hops=cfg.retrieval.graph_hops,
         max_graph_regions=cfg.retrieval.max_graph_regions,
+        text_weight=cfg.retrieval.text_weight,
+        graph_weight=cfg.retrieval.graph_weight,
     )
     return baseline, enhanced, corpus, cfg, None
 
@@ -130,6 +142,10 @@ def main() -> None:
         st.metric("Regions", len(corpus.regions))
         st.metric("Text chunks", len(corpus.chunks))
         st.metric("Figures / tables", len(corpus.visual_regions()))
+        if enhanced.visual_text_store is not None:
+            st.caption(
+                f"visual-text index: {len(enhanced.visual_text_store)} regions"
+            )
         if corpus.ocr_stats:
             st.caption(f"OCR usable rate: {corpus.ocr_stats.get('usable_rate', 0):.1%}")
         st.divider()
