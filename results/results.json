@@ -8,7 +8,7 @@
     "kg_extractor": "llm"
   },
   "n_questions": 24,
-  "generation_evaluated": false,
+  "generation_evaluated": true,
   "systems": {
     "baseline": {
       "system": "baseline_text_only",
@@ -104,21 +104,21 @@
       },
       "judge": {
         "faithfulness": {
-          "mean": 0.0,
-          "ci95_low": 0.0,
-          "ci95_high": 0.0,
-          "n": 0
+          "mean": 0.84,
+          "ci95_low": 0.7286,
+          "ci95_high": 0.9514,
+          "n": 20
         },
         "relevance": {
-          "mean": 0.0,
-          "ci95_low": 0.0,
-          "ci95_high": 0.0,
-          "n": 0
+          "mean": 0.66,
+          "ci95_low": 0.4638,
+          "ci95_high": 0.8562,
+          "n": 20
         }
       },
-      "mean_latency_s": 0.0,
-      "citation_validity": 0.0,
-      "support_rate": 0.0
+      "mean_latency_s": 3.7577,
+      "citation_validity": 1.0,
+      "support_rate": 1.0
     },
     "enhanced": {
       "system": "enhanced_multimodal_kg",
@@ -214,21 +214,21 @@
       },
       "judge": {
         "faithfulness": {
-          "mean": 0.0,
-          "ci95_low": 0.0,
-          "ci95_high": 0.0,
-          "n": 0
+          "mean": 0.78,
+          "ci95_low": 0.6447,
+          "ci95_high": 0.9153,
+          "n": 20
         },
         "relevance": {
-          "mean": 0.0,
-          "ci95_low": 0.0,
-          "ci95_high": 0.0,
-          "n": 0
+          "mean": 0.825,
+          "ci95_low": 0.6872,
+          "ci95_high": 0.9628,
+          "n": 20
         }
       },
-      "mean_latency_s": 0.0,
-      "citation_validity": 0.0,
-      "support_rate": 0.0
+      "mean_latency_s": 8.0698,
+      "citation_validity": 0.9833,
+      "support_rate": 1.0
     },
     "bm25_floor": {
       "system": "bm25_lexical_floor",
