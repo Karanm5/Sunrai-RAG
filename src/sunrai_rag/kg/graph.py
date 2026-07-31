@@ -2,7 +2,7 @@
 
 NetworkX is used rather than a graph database. At this scale a server-backed
 store adds operational burden without changing any result, and an in-process
-graph serialises to a single JSON file -- which keeps the reproduction a
+graph serialises to a single JSON file, which keeps the reproduction a
 one-command affair. The `expand` interface is storage-agnostic, so moving to
 Neo4j later is a backend swap, not a redesign.
 
@@ -29,7 +29,7 @@ class KnowledgeGraph:
     def __init__(self, graph: nx.MultiDiGraph | None = None):
         self.graph = graph if graph is not None else nx.MultiDiGraph()
 
-    # -- construction ------------------------------------------------------
+    #, construction ------------------------------------------------------
 
     @staticmethod
     def from_extraction(extraction: Extraction) -> KnowledgeGraph:
@@ -69,7 +69,7 @@ class KnowledgeGraph:
             source_region_id=relation.source_region_id,
         )
 
-    # -- inspection --------------------------------------------------------
+    #, inspection --------------------------------------------------------
 
     @property
     def n_nodes(self) -> int:
@@ -100,7 +100,7 @@ class KnowledgeGraph:
             return []
         return list(self.graph.nodes[node_id].get("source_region_ids", []))
 
-    # -- entity linking ----------------------------------------------------
+    #, entity linking ----------------------------------------------------
 
     def link_query_entities(self, query: str, max_entities: int = 5) -> list[str]:
         """Find graph nodes mentioned in a query string.
@@ -122,7 +122,7 @@ class KnowledgeGraph:
         matches.sort(key=lambda pair: (-pair[0], pair[1]))
         return [node for _, node in matches[:max_entities]]
 
-    # -- expansion ---------------------------------------------------------
+    #, expansion ---------------------------------------------------------
 
     def expand(self, seed_nodes: Sequence[str], hops: int = 1) -> set[str]:
         """Nodes reachable within `hops` edges of any seed, treating edges as
@@ -182,7 +182,7 @@ class KnowledgeGraph:
         """
         reached = self.expand(seed_nodes, hops=hops)
         seeds = set(seed_nodes)
-        # Prefer regions from expanded (non-seed) nodes -- those are the ones
+        # Prefer regions from expanded (non-seed) nodes, those are the ones
         # plain retrieval would have missed, which is the KG's actual value.
         ordered_nodes = sorted(reached - seeds) + sorted(reached & seeds)
         regions: list[str] = []
@@ -194,7 +194,7 @@ class KnowledgeGraph:
                     return regions
         return regions
 
-    # -- persistence -------------------------------------------------------
+    #, persistence -------------------------------------------------------
 
     def save(self, path: str | Path) -> None:
         path = Path(path)

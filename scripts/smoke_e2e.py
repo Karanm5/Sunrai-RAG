@@ -1,8 +1,8 @@
 """Offline end-to-end smoke test.
 
 Builds a synthetic corpus in which some answers exist ONLY in figure
-regions, then runs the full pipeline -- index, KG, QA construction,
-evaluation -- with no network, no models and no API key.
+regions, then runs the full pipeline, index, KG, QA construction,
+evaluation, with no network, no models and no API key.
 
 Purpose: prove the wiring works and the segmented comparison behaves as
 designed, before spending time on the real dataset. Numbers produced here
@@ -51,7 +51,7 @@ def build_synthetic_corpus(n_docs=6):
             text=(f"Data were collected prospectively across three sites over twelve "
                   f"months. Preprocessing followed standard normalisation for study {d}."),
             ocr_confidence=0.90))
-        # The value exists ONLY here -- no body text mentions it.
+        # The value exists ONLY here, no body text mentions it.
         regions.append(Region(
             f"{doc}_00001#r002", doc, "00001", RegionType.FIGURE, BBox(10,280,400,300),
             text=f"Figure {d+1}: accuracy of {80+d*2}.{d}% achieved by the {method}",

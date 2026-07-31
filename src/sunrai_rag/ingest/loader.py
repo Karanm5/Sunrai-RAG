@@ -138,7 +138,7 @@ def build_chunks(regions: list[Region], cfg: Config) -> list[Chunk]:
 
     "region" strategy (default): one chunk per layout region. This keeps the
     chunk boundary aligned with the document's own visual structure, which
-    makes provenance exact -- a cited chunk maps to one highlightable box on
+    makes provenance exact, a cited chunk maps to one highlightable box on
     the page. That property is worth more here than marginal retrieval gains
     from arbitrary windowing.
 

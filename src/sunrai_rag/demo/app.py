@@ -2,7 +2,7 @@
 
 The demo is built around the comparison rather than around a single answer
 box. Showing baseline and enhanced side by side, each with its provenance,
-makes the project's claim inspectable by a non-technical reviewer -- which
+makes the project's claim inspectable by a non-technical reviewer, which
 is the point of the explainability requirement.
 
 Run:  streamlit run src/sunrai_rag/demo/app.py

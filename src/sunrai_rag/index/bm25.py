@@ -5,7 +5,7 @@ plain lexical matching, the "semantic retrieval" claim is unearned. Reporting
 BM25 alongside the dense baseline is what turns a comparison into evidence.
 
 Implemented in ~60 lines rather than pulled from a library so the scoring is
-inspectable and pinned -- no silent behaviour change from a dependency bump.
+inspectable and pinned, no silent behaviour change from a dependency bump.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ from ..schemas import ScoredItem
 _TOKEN = re.compile(r"[a-z0-9]+")
 
 # Minimal stoplist: high-frequency function words that add noise to BM25 on
-# scientific prose. Deliberately short -- aggressive stopping removes terms
+# scientific prose. Deliberately short, aggressive stopping removes terms
 # like "control" or "significant" that carry meaning in this domain.
 _STOPWORDS = frozenset(
     """a an and are as at be by for from has have in is it its of on or that the

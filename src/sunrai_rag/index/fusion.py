@@ -2,7 +2,7 @@
 
 Why RRF rather than a weighted score sum: dense cosine scores, BM25 scores
 and CLIP similarities live on incomparable scales, so summing them requires
-per-modality normalisation and tuned weights -- both of which would need a
+per-modality normalisation and tuned weights, both of which would need a
 validation split this task does not have, and would risk tuning on the test
 set. RRF uses only *rank*, so it is scale-free and has a single, robust
 hyper-parameter.

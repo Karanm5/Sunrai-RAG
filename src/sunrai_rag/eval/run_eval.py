@@ -57,7 +57,7 @@ class RetrievalRecord:
     """What one system retrieved for one question.
 
     Persisted so the headline metrics can be recomputed later with nothing
-    installed beyond the standard library -- no models, no API key, no
+    installed beyond the standard library, no models, no API key, no
     network. A reviewer can confirm the numbers in seconds instead of
     reproducing a 45-minute pipeline, which is the difference between
     "reproducible in principle" and "actually checked".
@@ -187,7 +187,7 @@ def evaluate_system(
         per_segment[segment][0].append(retrieved)
         per_segment[segment][1].append(item.gold_region_ids)
 
-        # Judge a bounded sample -- judging every question is costly and the
+        # Judge a bounded sample, judging every question is costly and the
         # extra precision does not change the conclusion.
         if judge_llm is not None and answer is not None and index < judge_sample_size:
             evidence = "\n".join(
@@ -390,7 +390,7 @@ def verify_from_log(log_path: str | Path, k_values: Sequence[int], primary_k: in
                 f"{scores.recall.get(primary_k, 0.0):>9.4f}{scores.mrr:>9.4f}"
             )
     lines.append("=" * 66)
-    lines.append("Recomputed from the saved retrieval log -- no models, no API key.")
+    lines.append("Recomputed from the saved retrieval log, no models, no API key.")
     lines.append("=" * 66)
     return "\n".join(lines)
 

@@ -2,7 +2,7 @@
 
 Design note (important, and worth being able to defend at interview):
 the WebDataset shards pair a page render (`.png`) with a layout annotation
-(`.json`). The annotation gives bounding boxes and a category id -- it does
+(`.json`). The annotation gives bounding boxes and a category id, it does
 NOT contain the page text. That single fact drives the whole ingestion
 design: text has to be recovered by OCR over the region crops (see ocr.py).
 
@@ -116,7 +116,7 @@ def parse_page_annotation(
 
     Regions are dropped (not raised on) when they are unusable: unknown
     category, missing bbox, or degenerate after clipping to the page. The
-    caller logs the drop rate -- a silently high drop rate is a data-quality
+    caller logs the drop rate, a silently high drop rate is a data-quality
     signal worth reporting, so we return counts via `parse_stats`.
 
     `sample_key` is the WebDataset key, e.g. "PMC4991227_00003", from which

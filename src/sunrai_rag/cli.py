@@ -278,9 +278,9 @@ def cmd_ask(cfg, question: str, system_name: str) -> None:
 def cmd_doctor(cfg) -> int:
     """Check the environment before a long run fails halfway through.
 
-    Every problem hit during this project's bring-up -- a missing tesseract
+    Every problem hit during this project's bring-up, a missing tesseract
     binary, an absent optional dependency, an unset API key, a retired model
-    name -- announced itself only after minutes of work had already been
+    name, announced itself only after minutes of work had already been
     spent. This checks all of them up front, on any platform, in seconds.
 
     Returns the number of blocking problems found.

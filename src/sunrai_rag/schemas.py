@@ -166,7 +166,7 @@ class Provenance:
         return separate id spaces, so simply concatenating text-then-visual
         puts every visual hit *after* all k text hits. With top_k=5 the
         visual retriever's rank-1 result lands at position 6 and Recall@5 can
-        never credit it -- the enhanced system looks blind to figures even
+        never credit it, the enhanced system looks blind to figures even
         when its visual retrieval is perfect.
 
         Round-robin by rank gives each modality fair access to the top of the

@@ -1,8 +1,8 @@
 """Construct the evaluation question set.
 
 PubLayNet ships no QA ground truth, so the question set has to be built. The
-obvious approach -- ask an LLM to write a question from a chunk, then check
-retrieval finds that chunk -- is circular: the question inherits the chunk's
+obvious approach, ask an LLM to write a question from a chunk, then check
+retrieval finds that chunk, is circular: the question inherits the chunk's
 vocabulary, so retrieval succeeds for the wrong reason and Recall is
 inflated for every system.
 
@@ -50,7 +50,7 @@ Passage:
 _VISUAL_QUESTION_PROMPT = """\
 This is the caption of a figure or table in a scientific paper.
 
-Write ONE question whose answer appears ONLY in that figure/table -- for
+Write ONE question whose answer appears ONLY in that figure/table, for
 example a reported numeric value, or which item performs best.
 
 Rules:
@@ -69,7 +69,7 @@ Excerpt A: {text_a}
 
 Excerpt B: {text_b}
 
-Write ONE question that requires BOTH excerpts to answer -- neither alone
+Write ONE question that requires BOTH excerpts to answer, neither alone
 should be sufficient.
 
 Rules:
@@ -127,7 +127,7 @@ def build_qa_set(
     """Build a segmented, overlap-filtered question set.
 
     Returns questions of three types. Every item records the gold region ids
-    that genuinely contain its answer -- that is the ground truth retrieval
+    that genuinely contain its answer, that is the ground truth retrieval
     is scored against.
     """
     import random

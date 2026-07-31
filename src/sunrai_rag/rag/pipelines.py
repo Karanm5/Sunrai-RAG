@@ -7,7 +7,7 @@
 They share one interface (`answer(query) -> Answer`) so the evaluation
 harness treats them identically. That symmetry is what makes the comparison
 fair: same corpus, same generator, same top-k, same prompt template. The only
-differences are the ones under test -- visual evidence and structured
+differences are the ones under test, visual evidence and structured
 knowledge.
 
 Anything else varying between the two would confound the result, which is
@@ -117,7 +117,7 @@ class BaselineRAG:
 
     This is the control condition. It can only ever see words, so any
     question whose answer lives solely in a figure is structurally out of
-    reach -- which is precisely what the segmented evaluation measures.
+    reach, which is precisely what the segmented evaluation measures.
     """
 
     chunks: list[Chunk]
@@ -157,7 +157,7 @@ class EnhancedRAG:
       3. knowledge-graph expansion from entities named in the query
 
     The graph contributes regions that neither embedding retriever would
-    surface -- typically the region reporting a *result* when the query names
+    surface, typically the region reporting a *result* when the query names
     a *method*. Those arrive as a third ranking rather than being appended,
     so fusion arbitrates rather than one source always winning.
     """
@@ -173,7 +173,7 @@ class EnhancedRAG:
     # trained on natural photographs and performs at chance on cropped
     # scientific tables; the information in those regions is overwhelmingly
     # textual, so a text encoder is the right instrument for it. This is
-    # still cross-modal -- the content comes from a non-text modality and is
+    # still cross-modal, the content comes from a non-text modality and is
     # deliberately absent from the baseline's index.
     visual_text_store: VectorStore | None = None
     kg: KnowledgeGraph | None = None

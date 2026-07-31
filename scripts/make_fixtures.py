@@ -7,8 +7,8 @@ would have to eyeball.
 
 The renders imitate what PubLayNet actually contains: a rendered PMC page
 image plus a COCO-style annotation listing bounding boxes over five region
-classes. Critically, the annotation carries NO text -- exactly like the real
-thing -- so OCR is genuinely exercised.
+classes. Critically, the annotation carries NO text, exactly like the real
+thing, so OCR is genuinely exercised.
 """
 
 from __future__ import annotations
@@ -125,7 +125,7 @@ def render_page(doc_id: str, page_no: int, spec: list[dict], out_dir: Path) -> d
 
     key = f"{doc_id}_{page_no:05d}"
     image.save(out_dir / f"{key}.png")
-    # Note the shape: boxes and category ids only. No text -- as in the real dataset.
+    # Note the shape: boxes and category ids only. No text, as in the real dataset.
     (out_dir / f"{key}.json").write_text(
         json.dumps({"annotations": annotations}, indent=2), encoding="utf-8"
     )
@@ -150,7 +150,7 @@ def build_fixture_corpus(out_dir: Path, n_docs: int = 3) -> list[dict]:
              "text": (f"Methods. A {method} was trained on the clinical cohort. "
                       "Performance was assessed using accuracy and area under the curve. "
                       "Complete numerical results are reported in Figure 1 below.")},
-            # The accuracy VALUE appears only in this caption -- never in body text.
+            # The accuracy VALUE appears only in this caption, never in body text.
             {"type": "figure", "y": 500, "h": 230, "bars": [0.55, 0.72, 0.93],
              "text": f"Figure 1: accuracy of {acc}.5 percent achieved by the {method}"},
             {"type": "text", "y": 810,

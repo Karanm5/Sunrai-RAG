@@ -6,7 +6,7 @@ fusion and evaluation logic is exercised end to end in CI.
 
 CLIP is the multimodal component. It embeds figure/table crops and query
 text into a *shared* space, which is what allows a text query to retrieve an
-image directly -- the capability the text-only baseline structurally lacks.
+image directly, the capability the text-only baseline structurally lacks.
 """
 
 from __future__ import annotations
@@ -99,7 +99,7 @@ class CLIPEmbedder:
         `pooler_output` is sometimes the raw 768-dim vision state and
         sometimes the already-projected 512-dim embedding.
 
-        Guessing wrong is not a crash you can ignore -- it is a silent
+        Guessing wrong is not a crash you can ignore, it is a silent
         correctness bug. If one modality ends up projected and the other does
         not, they no longer share a space and cross-modal retrieval returns
         meaningless results while appearing to work.
@@ -162,7 +162,7 @@ class CLIPEmbedder:
             inputs = processor(images=batch, return_tensors="pt")
             pixel_values = inputs["pixel_values"].to(model.device)
             # _as_embedding may run a projection layer, so it must sit
-            # inside no_grad -- otherwise the result carries gradient
+            # inside no_grad, otherwise the result carries gradient
             # tracking and .numpy() refuses to convert it.
             with torch.no_grad():
                 result = model.get_image_features(pixel_values=pixel_values)
@@ -200,7 +200,7 @@ class HashingEmbedder:
 
     Real lexical signal (shared words produce similar vectors), so retrieval
     tests assert meaningful behaviour rather than tautologies. Used by the
-    test suite and CI only -- never for reported results.
+    test suite and CI only, never for reported results.
     """
 
     dim: int = 64

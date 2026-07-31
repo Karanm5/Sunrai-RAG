@@ -81,7 +81,7 @@ class TesseractEngine:
 
     `psm=6` ("assume a single uniform block of text") suits PubLayNet
     regions, which are already segmented into single blocks by the layout
-    annotation -- letting Tesseract re-segment tends to hurt.
+    annotation, letting Tesseract re-segment tends to hurt.
 
     `min_crop_height` upscales small crops before OCR. This is not a guess,
     and on this dataset it is not optional either.
@@ -97,7 +97,7 @@ class TesseractEngine:
         12px         1.000         1.000
 
     Without upscaling, small-text regions are silently misread rather than
-    failing loudly -- the damage then surfaces as poor retrieval, which is a
+    failing loudly, the damage then surfaces as poor retrieval, which is a
     misleading place to debug from.
 
     200px is sufficient; 300px adds nothing and 400px slightly degrades the
@@ -288,7 +288,7 @@ def ocr_regions(
     Crucially this does NOT leak into the text index: `build_chunks` filters
     on `is_textual`, so visual text is attached to the region for use as
     retrieved evidence but never becomes a searchable chunk. That keeps the
-    baseline genuinely text-only and the comparison fair -- if table text
+    baseline genuinely text-only and the comparison fair, if table text
     entered the shared index, the baseline would gain the very capability the
     experiment is trying to isolate.
 

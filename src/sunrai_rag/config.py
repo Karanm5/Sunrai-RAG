@@ -176,7 +176,7 @@ def _build_section(name: str, cls: type, raw: dict[str, Any]) -> Any:
 def load_config(path: str | Path | None = None, **overrides: Any) -> Config:
     """Load and validate a YAML config.
 
-    Unknown keys raise rather than being silently ignored -- a silently
+    Unknown keys raise rather than being silently ignored, a silently
     ignored typo in a config is a reproducibility bug waiting to happen.
     """
     raw: dict[str, Any] = {}

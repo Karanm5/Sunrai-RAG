@@ -1,6 +1,6 @@
 """Verify the ingestion path with REAL OCR against known ground truth.
 
-Everything here is the production code path -- real Tesseract, real cropping,
+Everything here is the production code path, real Tesseract, real cropping,
 real chunking, real validation. Only the pages are synthetic, and that is
 deliberate: because we rendered them, we know exactly what the text should
 be, so OCR quality is *measurable* rather than eyeballed.

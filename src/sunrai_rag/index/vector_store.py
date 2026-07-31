@@ -57,7 +57,7 @@ class VectorStore:
         """Return the top-k most similar items, highest score first.
 
         Ties are broken by index order, which makes the ranking a total order
-        and therefore stable across runs -- important for reproducibility.
+        and therefore stable across runs, important for reproducibility.
         """
         if k <= 0:
             raise ValueError("k must be positive")
@@ -104,7 +104,7 @@ class VectorStore:
 class FaissVectorStore(VectorStore):
     """FAISS-backed drop-in for larger corpora.
 
-    Uses IndexFlatIP, which is also exact -- so results match the numpy path.
+    Uses IndexFlatIP, which is also exact, so results match the numpy path.
     Present to show the scaling route without making FAISS a hard dependency
     of the reproduction.
     """

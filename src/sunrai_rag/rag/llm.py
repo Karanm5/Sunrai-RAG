@@ -172,7 +172,7 @@ class OpenAICompatibleBackend:
     """Any OpenAI-compatible chat-completions endpoint.
 
     One class covers Groq, Together, OpenRouter, and a local Ollama or vLLM
-    server -- they all speak the same wire format. Only `base_url`, `model`
+    server, they all speak the same wire format. Only `base_url`, `model`
     and the API-key environment variable change.
 
     This is the deployment-flexibility point in practice: switching between a
@@ -293,7 +293,7 @@ class OpenAICompatibleBackend:
 
 
 # Presets for the providers most likely to be used here. Model names change
-# over time -- check the provider's current list rather than trusting these.
+# over time, check the provider's current list rather than trusting these.
 PROVIDER_PRESETS: dict[str, dict[str, str]] = {
     "groq": {
         "base_url": "https://api.groq.com/openai/v1",
@@ -324,7 +324,7 @@ PROVIDER_PRESETS: dict[str, dict[str, str]] = {
 class LocalBackend:
     """Small local instruct model via transformers. No API key, no network
     after the first model download. Answer quality is materially lower than
-    the API backend -- the report states this rather than comparing across
+    the API backend, the report states this rather than comparing across
     backends as though they were equivalent."""
 
     model_name: str = "Qwen/Qwen2.5-1.5B-Instruct"
@@ -374,7 +374,7 @@ class StubBackend:
     """Deterministic offline backend for tests and CI.
 
     Produces a structurally valid answer derived from the prompt so the full
-    pipeline -- including citation parsing and provenance assembly -- is
+    pipeline, including citation parsing and provenance assembly, is
     exercised without any model. It is not a quality signal and must never be
     used for reported results; `run_eval` refuses to write headline results
     when this backend is active.
