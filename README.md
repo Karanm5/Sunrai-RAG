@@ -141,6 +141,21 @@ sunrai-rag ask --system enhanced -q "Which method scored highest?"
 sunrai-rag ask --system baseline -q "Which method scored highest?"
 ```
 
+### Interactive demo
+
+There is a small Streamlit app for exploring the two systems side by side. It
+runs locally and reads the artefacts produced by the pipeline, so run the
+stages above first. It is not deployed anywhere.
+
+```bash
+streamlit run src/sunrai_rag/demo/app.py -- --config configs/groq.yaml
+```
+
+Enter a question and it shows both systems' answers next to each other, each
+with the evidence behind it: the text passages, the figure crops, and the
+graph entities that were linked. It is the quickest way to see why the two
+systems differ on a particular question.
+
 ### Installing tesseract by hand
 
 ```bash

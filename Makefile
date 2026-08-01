@@ -36,11 +36,14 @@ all: ingest index kg qa evaluate   ## Full pipeline end to end
 smoke:      ## Offline smoke test: no network, no API key
 	PYTHONPATH=src pytest tests/ -q && $(PY) ingest --config configs/ci.yaml || true
 
-demo:       ## Launch the Streamlit demo
-	PYTHONPATH=src streamlit run src/sunrai_rag/demo/app.py -- --config $(CONFIG)
+demo:       ## Launch the Streamlit demo (needs the pipeline to have run)
+	streamlit run src/sunrai_rag/demo/app.py -- --config $(CONFIG)
 
 docker:     ## Build the container
 	docker build -t sunrai-rag .
+
+docker-verify: docker   ## Build, then recompute the results inside the image
+	docker run --rm -v "$(PWD)/results:/app/results" sunrai-rag verify
 
 clean:      ## Remove generated artefacts (keeps results/)
 	rm -rf artifacts/ data/ .pytest_cache __pycache__
