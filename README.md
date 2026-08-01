@@ -39,22 +39,43 @@ disturbs rankings that were already correct, and that cost is part of the pictur
 
 Reproducing the whole pipeline needs tesseract, roughly 2 GB of models, an API key
 and about 45 minutes. Nobody handed a repository is going to do that, so I made the
-numbers checkable directly:
+numbers checkable directly. This takes about a minute, needs no models, no API key
+and no network, and works on Windows, macOS and Linux.
+
+You need Python 3.10 or newer. Check with `python3 --version` (macOS and Linux) or
+`py --version` (Windows). macOS ships with an older Python on some versions, so
+install a current one from python.org if yours is below 3.10.
+
+From inside the project folder:
 
 ```bash
-pip install -r requirements-min.txt
-sunrai-rag verify
-```
+# macOS and Linux
+python3 -m pip install -e .
+python3 -m pip install -r requirements-min.txt
 
-That recomputes every figure above from `results/retrieval_log.json`, which records
-exactly what each system retrieved for each question. It needs no models, no API key
-and no network, and takes a couple of seconds.
+python3 -m pytest tests/ -q                                  # 268 tests, ~4 seconds
+python3 -m sunrai_rag.cli verify --config configs/default.yaml
+```
 
 ```bash
-pytest tests/ -q
+# Windows, in Git Bash or PowerShell
+py -m pip install -e .
+py -m pip install -r requirements-min.txt
+
+py -m pytest tests/ -q
+py -m sunrai_rag.cli verify --config configs/default.yaml
 ```
 
-268 tests, offline, about four seconds.
+The tests should all pass, with 8 skipped. Those 8 need PyTorch, which this minimal
+install deliberately leaves out.
+
+`verify` recomputes every number in the table above from
+`results/retrieval_log.json`, which records exactly what each system retrieved for
+each evaluation question. The output should match the table.
+
+Once the package is installed you can also use the shorter form, `sunrai-rag verify`,
+if your shell picks up the installed command. The `python3 -m` form above works
+regardless, so it is the one worth trying first.
 
 ## Running it properly
 
