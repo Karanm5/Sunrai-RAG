@@ -37,7 +37,7 @@ disturbs rankings that were already correct, and that cost is part of the pictur
 
 ## Checking the results without running anything
 
-Reproducing the whole pipeline needs tesseract, roughly 2 GB of models, an API key
+Reproducing the whole pipeline needs tesseract, roughly 2 GB of models, an API key(in my case -  GROQ API key)
 and about 45 minutes. Nobody handed a repository is going to do that, so I made the
 numbers checkable directly:
 
