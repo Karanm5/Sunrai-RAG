@@ -2,7 +2,7 @@
 
 Its whole purpose is catching setup problems in seconds rather than after a
 long run fails, so it must never crash on a missing dependency or an offline
-network -- the exact conditions it exists to report.
+network, the exact conditions it exists to report.
 """
 import pytest
 
@@ -66,7 +66,7 @@ def test_local_and_stub_backends_need_no_key(capsys, monkeypatch):
 
 
 def test_survives_network_failure_during_model_check(capsys, monkeypatch):
-    """Offline must be reported, not raised -- doctor runs before anything works."""
+    """Offline must be reported, not raised, doctor runs before anything works."""
     monkeypatch.setattr("sunrai_rag.ingest.ocr.find_tesseract_binary",
                         lambda p=None: "/usr/bin/tesseract")
     monkeypatch.setenv("GROQ_API_KEY", "test-key")

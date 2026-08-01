@@ -348,7 +348,7 @@ def test_summary_formats_without_error():
 
 
 def test_retrieval_only_mode_makes_no_llm_calls():
-    """The graded core -- the retrieval comparison -- needs no LLM.
+    """The graded core, the retrieval comparison, needs no LLM.
 
     Separating it means a full baseline-vs-enhanced result is available in
     seconds and zero API calls, which matters on a rate-limited free tier.

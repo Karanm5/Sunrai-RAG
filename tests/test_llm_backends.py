@@ -1,6 +1,6 @@
 """OpenAI-compatible backend: response parsing, retries, throttling.
 
-The network call itself is mocked -- these tests pin the behaviour around it,
+The network call itself is mocked, these tests pin the behaviour around it,
 which is where the bugs actually live: rate-limit handling, backoff, and
 failing loudly instead of returning an empty answer.
 """

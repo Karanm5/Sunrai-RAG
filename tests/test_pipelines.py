@@ -345,7 +345,7 @@ def test_visual_text_route_retrieves_the_right_table(
     """The fix for a real measured failure.
 
     On the real corpus, CLIP-only visual retrieval scored 0.000 recall on
-    visual questions -- indistinguishable from chance, because CLIP is
+    visual questions, indistinguishable from chance, because CLIP is
     trained on natural photographs and scientific tables are far outside
     that distribution. Searching the OCR'd text of those regions with the
     text encoder retrieves them reliably.

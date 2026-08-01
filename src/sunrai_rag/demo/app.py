@@ -177,14 +177,14 @@ def main() -> None:
     if mode == "Compare both":
         left, right = st.columns(2)
         with left:
-            st.subheader("Baseline — text only")
+            st.subheader("Baseline, text only")
             with st.spinner("Retrieving…"):
                 answer = baseline.answer(question)
             st.write(answer.answer_text)
             st.caption(f"{answer.latency_s:.2f}s")
             render_provenance(answer, corpus, show_images=False)
         with right:
-            st.subheader("Enhanced — multimodal + KG")
+            st.subheader("Enhanced, multimodal + KG")
             with st.spinner("Retrieving…"):
                 answer = enhanced.answer(question)
             st.write(answer.answer_text)
