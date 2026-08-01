@@ -37,7 +37,7 @@ disturbs rankings that were already correct, and that cost is part of the pictur
 
 ## Checking the results without running anything
 
-Reproducing the whole pipeline needs tesseract, roughly 2 GB of models, an API key(in my case -  GROQ API key)
+Reproducing the whole pipeline needs tesseract, roughly 2 GB of models, an API key
 and about 45 minutes. Nobody handed a repository is going to do that, so I made the
 numbers checkable directly:
 
@@ -58,31 +58,83 @@ pytest tests/ -q
 
 ## Running it properly
 
+### Which config to use
+
+Three are provided. Pick one and pass it to every command.
+
+| Config | Generation backend | Needs |
+|---|---|---|
+| `configs/groq.yaml` | Groq, free tier | a free key from console.groq.com |
+| `configs/default.yaml` | Anthropic | a paid API key |
+| `configs/ci.yaml` | offline stub | nothing, but produces no real results |
+
+The results in this repository were produced with `configs/groq.yaml`. The
+examples below use it.
+
+### Setup
+
 ```bash
-# 1. Environment. Conda handles the tesseract binary for you.
+# Option A: conda. This also installs the tesseract binary for you.
 conda env create -f environment.yml
 conda activate sunrai-rag
 
-# or with pip, in which case install tesseract separately (see below)
+# Option B: pip. Install tesseract separately first (see below).
 pip install -e .
 pip install -r requirements.txt
-
-# 2. Check the environment before committing to a long run
-export GROQ_API_KEY=...
-sunrai-rag doctor --config configs/groq.yaml
-
-# 3. Run the stages
-sunrai-rag ingest   --config configs/groq.yaml
-sunrai-rag index    --config configs/groq.yaml
-sunrai-rag kg       --config configs/groq.yaml
-sunrai-rag build-qa --config configs/groq.yaml
-sunrai-rag evaluate --config configs/groq.yaml
 ```
 
-Each stage saves its output, so you can iterate on retrieval without repeating the
-slow OCR pass.
+Then set your key. On Windows use `set GROQ_API_KEY=...` in cmd, or
+`$env:GROQ_API_KEY="..."` in PowerShell.
 
-Ask a single question against either system:
+```bash
+export GROQ_API_KEY=your_key_here
+```
+
+### Check before you start
+
+```bash
+sunrai-rag doctor --config configs/groq.yaml
+```
+
+This checks your Python version, every dependency, the tesseract binary, your
+API key, and whether the model named in the config still exists at the
+provider. It takes seconds and it will tell you what is wrong before a long
+run fails halfway.
+
+### Run the five stages
+
+Run them in this order, one at a time. Each writes its output to `artifacts/`
+and the next stage reads it, so you can stop and resume between them.
+
+```bash
+sunrai-rag ingest   --config configs/groq.yaml   # 10 to 15 min
+sunrai-rag index    --config configs/groq.yaml   # 3 min, downloads models first time
+sunrai-rag kg       --config configs/groq.yaml   # 5 min
+sunrai-rag build-qa --config configs/groq.yaml   # 8 min
+sunrai-rag evaluate --config configs/groq.yaml   # seconds
+```
+
+What each one produces:
+
+| Stage | Writes | What it does |
+|---|---|---|
+| `ingest` | `artifacts/corpus.json` | streams the pages, crops regions, runs OCR |
+| `index` | `artifacts/text_index/`, `visual_text_index/`, `image_index/` | builds the searchable indexes |
+| `kg` | `artifacts/kg.json` | extracts entities and relations |
+| `build-qa` | `artifacts/qa_set.json` | writes the evaluation questions |
+| `evaluate` | `results/comparison.csv`, `results.json`, `retrieval_log.json` | the comparison |
+
+After `ingest`, check the OCR quality before going further. Below about 0.60
+usable rate something is wrong, most likely tesseract:
+
+```bash
+python -c "import json; print(json.load(open('artifacts/corpus.json'))['ocr_stats'])"
+```
+
+Model responses are cached, so re-running any stage replays instead of
+repeating the work. If a run is interrupted, start the same command again.
+
+### Ask a single question
 
 ```bash
 sunrai-rag ask --system enhanced -q "Which method scored highest?"
@@ -96,9 +148,10 @@ sudo apt-get install tesseract-ocr tesseract-ocr-eng   # Debian and Ubuntu
 brew install tesseract                                  # macOS
 ```
 
-On Windows, use the installer at https://github.com/UB-Mannheim/tesseract/wiki and
-tick the option to add it to PATH. If it still cannot be found, `sunrai-rag doctor`
-will say so, and you can set `ingest.tesseract_cmd` in the config to the full path.
+On Windows, use the installer at https://github.com/UB-Mannheim/tesseract/wiki
+and tick the option to add it to PATH. If it still cannot be found,
+`sunrai-rag doctor` will say so, and you can set `ingest.tesseract_cmd` in the
+config to the full path of `tesseract.exe`.
 
 ## The dataset finding that shaped everything
 

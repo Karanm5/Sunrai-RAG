@@ -1,8 +1,14 @@
+# conda env create -f environment.yml && conda activate sunrai-rag
+#
+# Conda supplies the tesseract binary, which is the one dependency pip cannot
+# provide. The final line installs this package itself, which is what puts the
+# `sunrai-rag` command on your PATH.
 name: sunrai-rag
 channels: [conda-forge, defaults]
 dependencies:
   - python=3.11
   - pip=24.0
-  - tesseract=5.4.1          # OCR binary, installed by conda so no apt needed
+  - tesseract=5.4.1
   - pip:
       - -r requirements.txt
+      - -e .
